@@ -12,12 +12,8 @@ import Faqs from './components/Faqs'
 import AdminReviews from './components/AdminReviews'
 import Footer from './components/Footer'
 import TopBar from './components/TopBar'
-import AdminPanel from "../admin/AdminPanel";
 import ManagedPage from './components/ManagedPage'
 import Blog from './components/Blog'
-import ContentAdmin from "../admin/ContentAdmin";
-import RequestsAdmin from "../admin/RequestsAdmin";
-import HeroAdmin from "../admin/HeroAdmin";
 import FooterReviews from './components/FooterReviews'
 import Pricing from './components/Pricing'
 
@@ -39,10 +35,6 @@ export default function App() {
     <Route path="/blog" element={<WithNavbar><Blog /></WithNavbar>} />
     <Route path="/blog/:slug" element={<WithNavbar><Blog /></WithNavbar>} />
     <Route path="/admin/reviews" element={<AdminReviews />} />
-    <Route path="/admin" element={<AdminPanel />} />
-    <Route path="/admin/content" element={<ContentAdmin />} />
-    <Route path="/admin/requests" element={<RequestsAdmin />} />
-    <Route path="/admin/hero" element={<HeroAdmin />} />
     <Route path="/p/:slug" element={<WithNavbar><ManagedPage /></WithNavbar>} />
   </Routes>
 }
