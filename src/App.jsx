@@ -12,12 +12,12 @@ import Faqs from './components/Faqs'
 import AdminReviews from './components/AdminReviews'
 import Footer from './components/Footer'
 import TopBar from './components/TopBar'
-import AdminPanel from '../../admin/AdminPanel'
+import AdminPanel from "../admin/AdminPanel";
 import ManagedPage from './components/ManagedPage'
 import Blog from './components/Blog'
-import ContentAdmin from '../../admin/ContentAdmin'
-import RequestsAdmin from '../../admin/RequestsAdmin'
-import HeroAdmin from '../../admin/HeroAdmin'
+import ContentAdmin from "../admin/ContentAdmin";
+import RequestsAdmin from "../admin/RequestsAdmin";
+import HeroAdmin from "../admin/HeroAdmin";
 import FooterReviews from './components/FooterReviews'
 import Pricing from './components/Pricing'
 
