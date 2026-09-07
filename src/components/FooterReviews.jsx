@@ -7,7 +7,8 @@ export default function FooterReviews() {
   const [reviews, setReviews] = useState([])
   const [page, setPage] = useState(0)
   useEffect(() => { fetch('https://chalakgo.onrender.com/api/reviews').then(response => response.ok ? response.json() : []).then(setReviews).catch(() => {}) }, [])
-  const pages = useMemo(() => Array.from({ length: Math.ceil(reviews.length / perPage) }, (_, index) => reviews.slice(index * perPage, index * perPage + perPage)), [reviews])
+  const uniqueReviews = [...new Map(reviews.map(review => [String(review._id), review])).values()].slice(0, 4)
+  const pages = useMemo(() => Array.from({ length: Math.ceil(uniqueReviews.length / perPage) }, (_, index) => uniqueReviews.slice(index * perPage, index * perPage + perPage)), [uniqueReviews])
   useEffect(() => { if (pages.length < 2) return; const timer = setInterval(() => setPage(current => (current + 1) % pages.length), 5000); return () => clearInterval(timer) }, [pages.length])
   if (!reviews.length) return null
   const visible = pages[page] || []
