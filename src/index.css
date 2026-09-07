@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root { color: #10213f; background: #f4f7fc; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; background: #f4f7fc; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+body.mobile-nav-open { overflow: hidden; }
+.mobile-menu-button { display: grid; }
+@media (min-width: 768px) { .mobile-menu-button { display: none !important; } }
+button[class*="bg-blue-600"][class*="text-blue-700"] { color: white !important; }
+@media (max-width: 767px) {
+  /* The open drawer must be viewport-bound, so it cannot spill over page content. */
+  header.sticky > div { position: fixed !important; top: 0 !important; right: 0; bottom: 0; left: auto !important; width: 50vw !important; max-height: none !important; box-shadow: -18px 0 42px rgb(15 35 70 / .18); }
+  header.sticky > div > .grid { display: grid !important; visibility: visible !important; opacity: 1 !important; color: #10213f !important; }
+  body.mobile-nav-open header.sticky button[aria-expanded="true"] { position: fixed; top: 14px; right: 14px; z-index: 130; border-color: #d8e1ee; background: #fff; box-shadow: 0 6px 18px rgb(15 35 70 / .12); }
+}
+button, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+.nav-link { position: relative; transition: color .2s ease; }
+.nav-link:hover { color: #1463e8; }
+.nav-link::after { position: absolute; right: 0; bottom: -6px; left: 0; height: 2px; transform: scaleX(0); border-radius: 99px; background: #1463e8; content: ""; transition: transform .2s ease; }
+.nav-link:hover::after { transform: scaleX(1); }
+.input { display: block; width: 100%; min-height: 48px; margin-top: 8px; border: 1px solid #dce4f0; border-radius: 12px; background: #f8faff; padding: 0 14px; color: #172b4d; font-weight: 500; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; outline: none; }
+.input:hover { border-color: #b8c9e4; background: #fff; }
+.input:focus { border-color: #1463e8; background: #fff; box-shadow: 0 0 0 4px rgb(20 99 232 / .12); }
+
+/* Shared commercial visual language for all existing pages. */
+:where([class~="bg-[#f7f9fc]"]) { background: radial-gradient(circle at 88% 8%, #e4efff 0, transparent 26rem), radial-gradient(circle at 4% 45%, #edf7ff 0, transparent 23rem), #f6f8fc !important; }
+:where([class~="bg-[#090f20]"]) { background: radial-gradient(circle at 50% -10%, #173c78 0, transparent 34rem), linear-gradient(135deg, #081328, #0d1d3a) !important; }
+:where([class~="bg-white"]) { box-shadow: 0 14px 38px rgb(30 55 95 / .06); }
+:where([class~="bg-blue-600"]) { background-color: #1463e8 !important; }
+:where([class~="text-blue-600"]) { color: #1463e8 !important; }
+:where([class~="text-[#101a31]"]) { color: #10213f !important; }
+section { position: relative; }
+::selection { background: #c8dcff; color: #10213f; }
+img[alt="Professional driver next to a premium car"] { content: url('https://chalakgo.onrender.com/api/hero-image'); }
+section[class*="f5f8fd"] > div { max-width: 980px !important; }
+@media (min-width: 768px) { section[class*="f5f8fd"] .grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
