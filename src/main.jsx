@@ -3,9 +3,10 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
+import { Toaster } from 'sonner'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter><App /></BrowserRouter>
+    <BrowserRouter><App /><Toaster position="top-center" richColors closeButton /></BrowserRouter>
   </StrictMode>,
 )

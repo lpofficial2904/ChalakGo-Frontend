@@ -1,22 +1,23 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Clock3, Mail, MapPin, Phone } from 'lucide-react'
+import { API_BASE } from '../utils/api.js'
 
-const defaults = { siteName: 'ChalakGo', logo: '', phone: '+91 98765 43210', email: 'support@chalakgo.in', address: '', facebook: '', instagram: '', linkedin: '', youtube: '' }
+const defaults = { siteName: 'ChalakGo', logo: '', footerLogo: '', phone: '+91 98765 43210', email: 'support@chalakgo.in', address: '', facebook: '', instagram: '', linkedin: '', youtube: '' }
 const fallbackServices = [{ slug: 'driver-only', name: 'Driver Only' }, { slug: 'car-driver', name: 'Car + Driver' }, { slug: 'permanent-driver', name: 'Permanent Driver' }]
 const socialNetworks = [['Facebook', 'facebook'], ['Instagram', 'instagram'], ['LinkedIn', 'linkedin'], ['YouTube', 'youtube']]
 
 export default function Footer() {
   const [settings, setSettings] = useState(defaults)
   const [services, setServices] = useState(fallbackServices)
-  useEffect(() => { fetch('https://chalakgo.onrender.com/api/settings').then(response => response.ok ? response.json() : null).then(data => data && setSettings(value => ({ ...defaults, ...value, ...data }))).catch(() => {}) }, [])
-  useEffect(() => { fetch('https://chalakgo.onrender.com/api/services').then(response => response.ok ? response.json() : null).then(items => { if (Array.isArray(items)) setServices(items) }).catch(() => {}) }, [])
+  useEffect(() => { fetch(`${API_BASE}/api/settings`).then(response => response.ok ? response.json() : null).then(data => data && setSettings(value => ({ ...defaults, ...value, ...data }))).catch(() => {}) }, [])
+  useEffect(() => { fetch(`${API_BASE}/api/services`).then(response => response.ok ? response.json() : null).then(items => { if (Array.isArray(items)) setServices(items) }).catch(() => {}) }, [])
   const phone = settings.phone || defaults.phone
   const socialLinks = socialNetworks.filter(([, key]) => settings[key])
 
   return <footer className="overflow-hidden bg-[#071226] text-slate-300"><div className="mx-auto max-w-[1280px] px-5 py-14 sm:py-16 lg:px-8">
     <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-      <div>{settings.logo ? <img src={settings.logo} alt={settings.siteName} className="h-12 max-w-xs object-contain object-left" /> : <p className="text-3xl font-extrabold tracking-tight text-white">{settings.siteName}</p>}<p className="mt-5 max-w-[16rem] text-sm leading-7 text-slate-400">Professional driver services for daily travel, business journeys and every special occasion.</p>{socialLinks.length > 0 && <div className="mt-6 flex flex-wrap gap-2">{socialLinks.map(([name, key]) => <a key={key} href={settings[key]} target="_blank" rel="noreferrer" aria-label={name} className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition hover:-translate-y-1 hover:border-blue-400 hover:bg-blue-600 hover:text-white"><SocialIcon name={name} /></a>)}</div>}</div>
+      <div>{settings.footerLogo || settings.logo ? <img src={settings.footerLogo || settings.logo} alt={settings.siteName} className="h-12 max-w-xs object-contain object-left" /> : <p className="text-3xl font-extrabold tracking-tight text-white">{settings.siteName}</p>}<p className="mt-5 max-w-[16rem] text-sm leading-7 text-slate-400">Professional driver services for daily travel, business journeys and every special occasion.</p>{socialLinks.length > 0 && <div className="mt-6 flex flex-wrap gap-2">{socialLinks.map(([name, key]) => <a key={key} href={settings[key]} target="_blank" rel="noreferrer" aria-label={name} className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition hover:-translate-y-1 hover:border-blue-400 hover:bg-blue-600 hover:text-white"><SocialIcon name={name} /></a>)}</div>}</div>
       <FooterColumn title="Quick Links" links={[['Home', '/'], ['About us', '/about'], ['Services', '/services'], ['Pricing', '/pricing'], ['Blog', '/blog'], ['Contact', '/contact']]} />
       <FooterColumn title="Our Services" links={services.map(service => [service.name, `/services/${service.slug}`])} empty="New services will appear here." />
       <div><h2 className="text-sm font-extrabold uppercase tracking-[.16em] text-white">Contact Us</h2><div className="mt-5 grid gap-5 text-sm"><ContactItem icon={<Phone size={18} />} title="Phone" text={phone} href={`tel:${phone.replace(/\s/g, '')}`} /><ContactItem icon={<Mail size={18} />} title="Email" text={settings.email} href={`mailto:${settings.email}`} />{settings.address && <ContactItem icon={<MapPin size={18} />} title="Address" text={settings.address} />}<ContactItem icon={<Clock3 size={18} />} title="Working hours" text="24/7 booking assistance" /></div></div>

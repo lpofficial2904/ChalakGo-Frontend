@@ -33,6 +33,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 :where([class~="text-[#101a31]"]) { color: #10213f !important; }
 section { position: relative; }
 ::selection { background: #c8dcff; color: #10213f; }
-img[alt="Professional driver next to a premium car"] { content: url('https://chalakgo.onrender.com/api/hero-image'); }
 section[class*="f5f8fd"] > div { max-width: 980px !important; }
 @media (min-width: 768px) { section[class*="f5f8fd"] .grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #f1f5fb; }
+::-webkit-scrollbar-thumb { border: 3px solid #f1f5fb; border-radius: 99px; background: #9bb8e8; }
+::-webkit-scrollbar-thumb:hover { background: #5f8fda; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}

@@ -1,13 +1,38 @@
+import { useEffect, useState } from 'react'
+import { ArrowRight, Check, ShieldCheck, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { API_BASE } from '../utils/api.js'
 
-const prices = [
-  ['Local / Out City Trip', 'Driver Only', ['First 1–4 hours: ₹149/hr', 'Additional hours: ₹99/hr', 'Minimum 4-hour charge applies']],
-  ['Multi-Day Trip', 'Outstation Driver', ['₹1,200/day', 'Minimum 2-day charge applies', 'Night and meal charges may apply']],
-  ['Drop Ride Driver', 'One-way drop', ['0–140 km: ₹1,100 fixed', 'Additional km: ₹4/km (two-way calculation)', 'Drop near a bus stand or railway station for safe return']],
-  ['Permanent Driver', 'Monthly plan', ['6–8 hours: ₹13,000 – ₹15,000/month', '8–10 hours: ₹15,000 – ₹18,000/month', '10–12 hours: ₹18,000 – ₹22,000/month']],
-  ['Jaipur Tour', 'Private sightseeing', ['1-day tour: from ₹2,999', '2-day tour: from ₹5,499', 'Places and final price can be tailored']],
+const fallbackServices = [
+  { slug: 'driver-only', name: 'Driver Only', price: '₹65/hr; ₹60/hr for 24 hours', detail: 'A trained, verified chauffeur for your own car.' },
+  { slug: 'car-driver', name: 'Cab (Car + Driver)', price: 'SUV ₹18/km; Hatchback ₹14/km; Haravan Traveller ₹35/km', pricingType: 'distance', vehicleRates: { suv: 18, hatchback: 14, traveller: 35 }, detail: 'Car and professional driver for every trip.' },
+  { slug: 'permanent-driver', name: 'Permanent Driver', price: '₹15,000–₹22,000/month', pricingType: 'monthly', monthlyRates: { sixToEight: 15000, eightToTen: 18000, tenToTwelve: 22000 }, detail: 'A dedicated driver for your daily routine.' },
+  { slug: 'jaipur-tour', name: 'Jaipur Tour', price: 'Plans from ₹2,999', pricingType: 'fixed', tourPlans: [{ days: 1, price: '₹2,999' }, { days: 2, price: '₹3,499' }], detail: 'Private sightseeing with a professional driver.' },
 ]
 
+function pricingLines(service) {
+  if (service.pricingType === 'distance' && service.vehicleRates) return [
+    service.vehicleRates.suv && `SUV · ₹${service.vehicleRates.suv}/km`,
+    service.vehicleRates.hatchback && `Hatchback · ₹${service.vehicleRates.hatchback}/km`,
+    service.vehicleRates.traveller && `Haravan Traveller · ₹${service.vehicleRates.traveller}/km`,
+  ].filter(Boolean)
+  if (service.pricingType === 'monthly' && service.monthlyRates) return [
+    service.monthlyRates.sixToEight && `6–8 hours · ₹${Number(service.monthlyRates.sixToEight).toLocaleString('en-IN')}/month`,
+    service.monthlyRates.eightToTen && `8–10 hours · ₹${Number(service.monthlyRates.eightToTen).toLocaleString('en-IN')}/month`,
+    service.monthlyRates.tenToTwelve && `10–12 hours · ₹${Number(service.monthlyRates.tenToTwelve).toLocaleString('en-IN')}/month`,
+  ].filter(Boolean)
+  if (service.pricingType === 'fixed' && service.tourPlans?.length) return service.tourPlans.map(plan => `${plan.days}-day plan · ${plan.price}`)
+  return service.price ? service.price.split(';').map(item => item.trim()).filter(Boolean) : []
+}
+
 export default function Pricing() {
-  return <main className="min-h-screen bg-[#f7f9fc] px-5 py-16 text-[#101a31] sm:py-24"><section className="mx-auto max-w-6xl"><div className="text-center"><p className="font-bold text-blue-600">SERVICE CHARGES</p><h1 className="mt-3 text-4xl font-extrabold sm:text-5xl">Our pricing</h1><p className="mt-4 text-lg text-slate-600">Clear pricing for every ChalakGo service.</p></div><div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{prices.map(([title, type, items]) => <article key={title} className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm"><p className="text-sm font-bold text-blue-600">{type}</p><h2 className="mt-2 text-2xl font-extrabold">{title}</h2><ul className="mt-6 space-y-3 text-sm leading-6 text-slate-600">{items.map(item => <li key={item}>✓ {item}</li>)}</ul><Link to={title === 'Jaipur Tour' ? '/services/jaipur-tour' : title === 'Permanent Driver' ? '/services/permanent-driver' : '/services'} className="mt-8 inline-block font-bold text-blue-600">View details &amp; book →</Link></article>)}</div><p className="mt-8 text-center text-sm text-slate-500">Taxes, tolls, parking and any special requirements may be charged separately where applicable.</p></section></main>
+  const [services, setServices] = useState(fallbackServices)
+  useEffect(() => {
+    fetch(`${API_BASE}/api/services`)
+      .then(response => response.ok ? response.json() : [])
+      .then(items => { if (Array.isArray(items) && items.length) setServices(items) })
+      .catch(() => {})
+  }, [])
+
+  return <main className="min-h-screen overflow-hidden bg-[#f6f9ff] px-5 py-10 text-[#10213f] sm:py-16"><section className="mx-auto max-w-6xl"><div className="relative overflow-hidden rounded-[32px] bg-[#091b38] px-7 py-12 text-center text-white shadow-2xl shadow-blue-950/15 sm:px-14 sm:py-16"><div aria-hidden="true" className="absolute -left-20 -top-24 h-64 w-64 rounded-full bg-blue-500/25 blur-3xl" /><div aria-hidden="true" className="absolute -bottom-24 -right-12 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" /><div className="relative"><p className="inline-flex items-center gap-2 rounded-full border border-blue-300/30 bg-white/10 px-4 py-2 text-xs font-bold tracking-[.14em] text-blue-100"><Sparkles size={14} /> TRANSPARENT SERVICE CHARGES</p><h1 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Simple prices.</h1><div className="mx-auto mt-7 flex w-fit items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm text-blue-100"><ShieldCheck size={17} className="text-cyan-300" /> Professional drivers · Clear rates · Trusted support</div></div></div><div className="relative z-10 mx-auto -mt-5 grid max-w-[1160px] gap-5 md:grid-cols-2 xl:grid-cols-3">{services.map((service, index) => { const lines = pricingLines(service); const accent = index % 3 === 0 ? 'from-blue-600 to-indigo-700' : index % 3 === 1 ? 'from-cyan-500 to-blue-600' : 'from-violet-600 to-indigo-700'; return <article key={service.slug} className="group flex min-h-[390px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_14px_40px_rgba(30,55,95,.10)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(30,55,95,.16)]"><div className={`h-2 bg-gradient-to-r ${accent}`} /><div className="flex flex-1 flex-col p-7"><div className="flex items-start justify-between gap-4"><div><p className="text-[11px] font-extrabold tracking-[.11em] text-blue-600">{service.eyebrow || 'CHALAKGO SERVICE'}</p><h2 className="mt-3 text-2xl font-extrabold tracking-tight text-[#0b2145]">{service.name}</h2></div><span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${accent} text-white shadow-lg`}><Sparkles size={19} /></span></div>{service.detail && <p className="mt-4 min-h-12 text-sm leading-6 text-slate-500">{service.detail}</p>}<div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/70 p-4"><p className="text-[10px] font-extrabold tracking-[.13em] text-blue-600">SERVICE PRICE</p><p className="mt-1 text-lg font-extrabold leading-7 text-[#09214a]">{service.price || 'Contact us for pricing'}</p></div>{lines.length > 0 && <ul className="mt-5 space-y-2.5 text-sm text-slate-600">{lines.map(line => <li key={line} className="flex items-start gap-2"><span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-50 text-emerald-600"><Check size={13} strokeWidth={3} /></span><span>{line}</span></li>)}</ul>}<Link to={`/services/${service.slug}`} className="mt-auto inline-flex items-center justify-between border-t border-slate-100 pt-6 text-sm font-extrabold text-blue-600 transition group-hover:text-blue-800">View details &amp; book <ArrowRight size={18} /></Link></div></article> })}</div><p className="mt-10 text-center text-sm leading-6 text-slate-500">Taxes, tolls, parking and special requirements may be charged separately where applicable.</p></section></main>
 }
