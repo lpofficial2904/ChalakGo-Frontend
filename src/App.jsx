@@ -41,10 +41,20 @@ function editableRoute(path, slug, Page, options = {}) {
 function EditablePage({ slug, Page, showFooterReviews = true }) {
   const [page, setPage] = useState(null)
   useEffect(() => {
-    fetch(`${API_BASE}/api/pages/${slug}`)
+    const controller = new AbortController()
+    // Built-in pages work without a published CMS override. Look up optional
+    // content in the collection instead of requesting a missing page resource.
+    fetch(`${API_BASE}/api/pages`, { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
-      .then(setPage)
-      .catch(() => setPage(null))
+      .then((pages) => {
+        if (!controller.signal.aborted) {
+          setPage(Array.isArray(pages) ? pages.find((item) => item.slug === slug) || null : null)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setPage(null)
+      })
+    return () => controller.abort()
   }, [slug])
   if (!page) return <PublicPage showFooterReviews={showFooterReviews}><Page /></PublicPage>
   return <PublicPage showFooterReviews={showFooterReviews}><main className="min-h-screen bg-[#f7f9fc] text-[#101a31]"><section className="bg-[#0b1c38] px-5 py-20 text-white sm:py-28"><div className="mx-auto max-w-4xl"><p className="font-bold text-blue-300">{page.navigationLabel || 'CHALAKGO'}</p><h1 className="mt-4 text-5xl font-extrabold leading-tight sm:text-6xl">{page.heroTitle || page.title}</h1>{page.excerpt && <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">{page.excerpt}</p>}</div></section><article className="mx-auto max-w-4xl whitespace-pre-wrap px-5 py-16 text-lg leading-8 text-slate-600 sm:py-24">{page.content}</article></main></PublicPage>

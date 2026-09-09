@@ -238,6 +238,7 @@ export default function Navbar() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-menu"
+          aria-label={open ? 'Close menu' : 'Open menu'}
           className="mobile-menu-button grid h-11 w-11 place-items-center rounded-xl border border-slate-200 text-2xl font-bold"
         >
           {open ? '×' : '☰'}
@@ -246,9 +247,10 @@ export default function Navbar() {
       {open && (
         <div
           id="mobile-menu"
-          className="fixed inset-x-0 bottom-0 top-[72px] z-[100] overflow-y-auto bg-white px-5 py-6 md:hidden"
+          className="mobile-drawer fixed z-[100] bg-white md:hidden"
         >
-          <div className="mx-auto grid max-w-md gap-2">
+          <div className="mobile-drawer-heading">Menu</div>
+          <div className="mobile-drawer-links">
             {menuLinks.slice(0, 2).map(([name, path]) => (
               <Link
                 key={name}
@@ -305,11 +307,12 @@ export default function Navbar() {
                 </button>
               </div>
             )}
-            <div className="mt-4 grid grid-cols-2 gap-3">
+          </div>
+            <div className="mobile-drawer-actions">
               <Link
                 to="/services"
                 onClick={close}
-                className="rounded-xl bg-blue-600 px-4 py-4 text-center font-bold text-white"
+                className="mobile-book-button rounded-xl bg-blue-600 text-center font-bold text-white"
               >
                 Book Now
               </Link>
@@ -317,13 +320,12 @@ export default function Navbar() {
                 <Link
                   to="/login"
                   onClick={close}
-                  className="rounded-xl border border-slate-300 px-4 py-4 text-center font-bold"
+                  className="rounded-xl border border-slate-300 bg-white text-center font-bold"
                 >
                   Login
                 </Link>
               )}
             </div>
-          </div>
         </div>
       )}
     </header>

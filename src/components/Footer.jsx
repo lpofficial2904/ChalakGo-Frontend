@@ -145,7 +145,7 @@ export default function Footer() {
           </span>
         </div>
       </div>
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-3 sm:bottom-7 sm:right-7">
+      <div className="floating-contact-actions fixed bottom-5 right-5 z-50 flex flex-col gap-3 sm:bottom-7 sm:right-7">
         <a
           href={`tel:${phone.replace(/\D/g, '')}`}
           aria-label={`Call ${settings.siteName || 'ChalakGo'}`}
