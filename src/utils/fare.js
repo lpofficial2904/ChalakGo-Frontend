@@ -7,9 +7,11 @@ export const TEMPORARY_DRIVER_PRICING = {
 }
 
 function parseBookingTime(value) {
-  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) throw new Error('Select a valid start and end date/time.')
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value))
+    throw new Error('Select a valid start and end date/time.')
   const milliseconds = Date.parse(`${value}:00Z`)
-  if (!Number.isFinite(milliseconds) || new Date(milliseconds).toISOString().slice(0, 16) !== value) throw new Error('Select a valid start and end date/time.')
+  if (!Number.isFinite(milliseconds) || new Date(milliseconds).toISOString().slice(0, 16) !== value)
+    throw new Error('Select a valid start and end date/time.')
   return milliseconds
 }
 
@@ -40,16 +42,33 @@ export function calculateTemporaryDriverFare({ startDateTime, endDateTime }) {
 export function calculateDistanceFare({ distanceKm, carType, vehicleRates }) {
   const distance = Number(distanceKm)
   const rates = vehicleRates || {}
-  const rate = /traveller/i.test(String(carType)) ? Number(rates.traveller) : /suv/i.test(String(carType)) ? Number(rates.suv) : Number(rates.hatchback)
-  if (!Number.isFinite(distance) || distance <= 0) throw new Error('Enter a valid trip distance in kilometres.')
-  if (!Number.isFinite(rate) || rate <= 0) throw new Error('This service does not have a valid vehicle rate.')
-  return { distanceKm: distance, ratePerKm: rate, totalFare: Math.round(distance * rate * 100) / 100 }
+  const rate = /traveller/i.test(String(carType))
+    ? Number(rates.traveller)
+    : /suv/i.test(String(carType))
+      ? Number(rates.suv)
+      : Number(rates.hatchback)
+  if (!Number.isFinite(distance) || distance <= 0)
+    throw new Error('Enter a valid trip distance in kilometres.')
+  if (!Number.isFinite(rate) || rate <= 0)
+    throw new Error('This service does not have a valid vehicle rate.')
+  return {
+    distanceKm: distance,
+    ratePerKm: rate,
+    totalFare: Math.round(distance * rate * 100) / 100,
+  }
 }
 
 export function calculateMonthlyFare({ duration, monthlyRates }) {
   const rates = monthlyRates || {}
-  const key = /6\s*[–-]\s*8/.test(String(duration)) ? 'sixToEight' : /8\s*[–-]\s*10/.test(String(duration)) ? 'eightToTen' : /10\s*[–-]\s*12/.test(String(duration)) ? 'tenToTwelve' : ''
+  const key = /6\s*[–-]\s*8/.test(String(duration))
+    ? 'sixToEight'
+    : /8\s*[–-]\s*10/.test(String(duration))
+      ? 'eightToTen'
+      : /10\s*[–-]\s*12/.test(String(duration))
+        ? 'tenToTwelve'
+        : ''
   const monthlyRate = Number(rates[key])
-  if (!key || !Number.isFinite(monthlyRate) || monthlyRate <= 0) throw new Error('Select a valid permanent driver shift.')
+  if (!key || !Number.isFinite(monthlyRate) || monthlyRate <= 0)
+    throw new Error('Select a valid permanent driver shift.')
   return { monthlyRate, totalFare: monthlyRate }
 }

@@ -1,37 +1,73 @@
+import { useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import Home from './components/Home'
 import About from './components/About'
-import Contact from './components/Contact'
-import Login from './components/Login'
-import Services from './components/Services'
-import HowItWorks from './components/HowItWorks'
-import Fleet from './components/Fleet'
-import Reviews from './components/Reviews'
-import Faqs from './components/Faqs'
-import AdminReviews from './components/AdminReviews'
-import SiteLayout from './components/SiteLayout'
-import ManagedPage from './components/ManagedPage'
 import Blog from './components/Blog'
+import Contact from './components/Contact'
+import Faqs from './components/Faqs'
+import Fleet from './components/Fleet'
+import Home from './components/Home'
+import HowItWorks from './components/HowItWorks'
+import Login from './components/Login'
+import ManagedPage from './components/ManagedPage'
 import Pricing from './components/Pricing'
+import Reviews from './components/Reviews'
+import Services from './components/Services'
+import SiteLayout from './components/SiteLayout'
+import { API_BASE } from './utils/api.js'
 
-function WithNavbar({ children }) { return <SiteLayout>{children}</SiteLayout> }
+// Every visitor page shares the same header, navigation, and footer.
+function PublicPage({ children, showFooterReviews = true }) {
+  return <SiteLayout showFooterReviews={showFooterReviews}>{children}</SiteLayout>
+}
+
+function publicRoute(path, Page, options = {}) {
+  return (
+    <Route
+      key={path}
+      path={path}
+      element={
+        <PublicPage {...options}>
+          <Page />
+        </PublicPage>
+      }
+    />
+  )
+}
+
+function editableRoute(path, slug, Page, options = {}) {
+  return <Route key={path} path={path} element={<EditablePage slug={slug} Page={Page} {...options} />} />
+}
+
+function EditablePage({ slug, Page, showFooterReviews = true }) {
+  const [page, setPage] = useState(null)
+  useEffect(() => {
+    fetch(`${API_BASE}/api/pages/${slug}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then(setPage)
+      .catch(() => setPage(null))
+  }, [slug])
+  if (!page) return <PublicPage showFooterReviews={showFooterReviews}><Page /></PublicPage>
+  return <PublicPage showFooterReviews={showFooterReviews}><main className="min-h-screen bg-[#f7f9fc] text-[#101a31]"><section className="bg-[#0b1c38] px-5 py-20 text-white sm:py-28"><div className="mx-auto max-w-4xl"><p className="font-bold text-blue-300">{page.navigationLabel || 'CHALAKGO'}</p><h1 className="mt-4 text-5xl font-extrabold leading-tight sm:text-6xl">{page.heroTitle || page.title}</h1>{page.excerpt && <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">{page.excerpt}</p>}</div></section><article className="mx-auto max-w-4xl whitespace-pre-wrap px-5 py-16 text-lg leading-8 text-slate-600 sm:py-24">{page.content}</article></main></PublicPage>
+}
 
 export default function App() {
-  return <Routes>
-    <Route path="/" element={<WithNavbar><Home /></WithNavbar>} />
-    <Route path="/about" element={<WithNavbar><About /></WithNavbar>} />
-    <Route path="/services" element={<WithNavbar><Services /></WithNavbar>} />
-    <Route path="/services/:service" element={<WithNavbar><Services /></WithNavbar>} />
-    <Route path="/pricing" element={<WithNavbar><Pricing /></WithNavbar>} />
-    <Route path="/contact" element={<WithNavbar><Contact /></WithNavbar>} />
-    <Route path="/login" element={<WithNavbar><Login /></WithNavbar>} />
-    <Route path="/how-it-works" element={<HowItWorks />} />
-    <Route path="/fleet" element={<Fleet />} />
-    <Route path="/reviews" element={<Reviews />} />
-    <Route path="/faqs" element={<Faqs />} />
-    <Route path="/blog" element={<WithNavbar><Blog /></WithNavbar>} />
-    <Route path="/blog/:slug" element={<WithNavbar><Blog /></WithNavbar>} />
-    <Route path="/admin/reviews" element={<AdminReviews />} />
-    <Route path="/p/:slug" element={<WithNavbar><ManagedPage /></WithNavbar>} />
-  </Routes>
+  return (
+    <Routes>
+      {editableRoute('/', 'home', Home)}
+      {editableRoute('/about', 'about', About)}
+      {editableRoute('/contact', 'contact', Contact)}
+      <Route path="/login" element={<Login />} />
+      {editableRoute('/pricing', 'pricing', Pricing)}
+      {publicRoute('/services', Services)}
+      {publicRoute('/services/:service', Services)}
+      {publicRoute('/blog', Blog)}
+      {publicRoute('/blog/:slug', Blog)}
+      {publicRoute('/p/:slug', ManagedPage)}
+
+      {editableRoute('/how-it-works', 'how-it-works', HowItWorks, { showFooterReviews: false })}
+      {editableRoute('/fleet', 'fleet', Fleet, { showFooterReviews: false })}
+      <Route path="/reviews" element={<Reviews />} />
+      {editableRoute('/faqs', 'faqs', Faqs, { showFooterReviews: false })}
+    </Routes>
+  )
 }
