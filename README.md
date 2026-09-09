@@ -1,16 +1,37 @@
-# React + Vite
+# ChalakGo Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Customer-facing React website for ChalakGo driver services. It is built with Vite, React, Tailwind CSS, and Framer Motion.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+The frontend expects the API at `http://127.0.0.1:5000` in local development. Vite forwards `/api` requests to that address.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Project map
 
-## Expanding the Oxlint configuration
+| Location | Purpose |
+| --- | --- |
+| `src/App.jsx` | Route definitions |
+| `src/components/SiteLayout.jsx` | Shared top bar, navigation, customer-review strip, and footer |
+| `src/components` | Page and reusable UI components |
+| `src/utils` | Small browser-safe helpers for API calls, booking data, locations, and fare estimates |
+| `src/index.css` | Global design tokens, form controls, accessibility, and responsive styles |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Design rules
+
+- Reuse `SiteLayout` for customer pages so navigation and footer stay consistent.
+- Keep page-specific data close to its page; move logic used by more than one page into `src/utils`.
+- Use the shared `input` class for form controls.
+- Calculate estimates in the browser only for feedback. The backend remains responsible for validating booking prices.
+
+## Production build
+
+```bash
+npm run build
+```
+
+Pushes to the `main` branch trigger the connected Netlify deployment.

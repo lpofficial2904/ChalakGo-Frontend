@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import defaultLogo from '../assets/Chalakgo logo.png'
 import { ChevronDown, LogOut, UserRound } from 'lucide-react'
 import { toast } from 'sonner'
 import { API_BASE } from '../utils/api.js'
 
 const menuLinks = [['Home', '/'], ['About', '/about'], ['Pricing', '/pricing'], ['Blog', '/blog'], ['Contact', '/contact']]
+const desktopLink = ({ isActive }) => `nav-link ${isActive ? 'text-blue-600' : ''}`
 const fallbackServices = [{ slug: 'driver-only', name: 'Driver Only' }, { slug: 'car-driver', name: 'Car + Driver' }, { slug: 'permanent-driver', name: 'Permanent Driver' }]
 
 export default function Navbar() {
@@ -30,15 +31,15 @@ export default function Navbar() {
     <nav className="mx-auto flex h-[72px] max-w-[1380px] items-center justify-between px-4 lg:px-12">
       <Link to="/" onClick={close} className="flex items-center"><img src={brand.navbarLogo || brand.logo || defaultLogo} alt={brand.siteName} className="h-10 w-auto sm:h-11" /></Link>
       <div className="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
-        <Link to="/">Home</Link><Link to="/about">About</Link>
+        <NavLink to="/" end className={desktopLink}>Home</NavLink><NavLink to="/about" className={desktopLink}>About</NavLink>
         <div className="group relative">
           <Link to="/services" className="flex items-center gap-1 py-6 hover:text-blue-600" aria-haspopup="true">Services <span aria-hidden="true" className="text-xs">⌄</span></Link>
           <div className="invisible absolute left-1/2 top-full w-56 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-            <Link to="/services" className="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide text-blue-600 hover:bg-blue-50"></Link>
+            <Link to="/services" className="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide text-blue-600 hover:bg-blue-50">All services</Link>
             {serviceLinks('block rounded-lg px-3 py-2.5 hover:bg-blue-50 hover:text-blue-600')}
           </div>
         </div>
-        <Link to="/pricing">Pricing</Link><Link to="/blog">Blog</Link><Link to="/contact">Contact</Link>
+        <NavLink to="/pricing" className={desktopLink}>Pricing</NavLink><NavLink to="/blog" className={desktopLink}>Blog</NavLink><NavLink to="/contact" className={desktopLink}>Contact</NavLink>
       </div>
       <div className="hidden items-center gap-2 sm:flex"><Link to="/services" className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white">Book Now</Link>{user ? <div className="relative"><button type="button" aria-expanded={userMenu} onClick={() => setUserMenu(value => !value)} className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-3 text-sm font-bold text-slate-700"><UserRound size={16} />{user.fullName?.split(' ')[0] || 'Account'}<ChevronDown size={15} className={userMenu ? 'rotate-180 transition' : 'transition'} /></button>{userMenu && <div className="absolute right-0 top-[calc(100%+8px)] z-[120] w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl"><div className="border-b border-slate-100 px-3 py-3"><p className="font-bold text-[#10213f]">{user.fullName || 'Customer'}</p><p className="mt-1 truncate text-xs text-slate-500">{user.email || user.mobile}</p></div><button type="button" onClick={logout} className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-3 text-left text-sm font-bold text-red-600 hover:bg-red-50"><LogOut size={16} />Logout</button></div>}</div> : <Link to="/login" className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold">Login</Link>}</div>
       <button type="button" onClick={() => setOpen(v => !v)} aria-expanded={open} aria-controls="mobile-menu" className="mobile-menu-button grid h-11 w-11 place-items-center rounded-xl border border-slate-200 text-2xl font-bold">{open ? '×' : '☰'}</button>

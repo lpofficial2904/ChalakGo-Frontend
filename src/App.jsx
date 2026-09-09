@@ -1,5 +1,4 @@
 import { Route, Routes } from 'react-router-dom'
-import Navbar from './components/navbar'
 import Home from './components/Home'
 import About from './components/About'
 import Contact from './components/Contact'
@@ -10,14 +9,12 @@ import Fleet from './components/Fleet'
 import Reviews from './components/Reviews'
 import Faqs from './components/Faqs'
 import AdminReviews from './components/AdminReviews'
-import Footer from './components/Footer'
-import TopBar from './components/TopBar'
+import SiteLayout from './components/SiteLayout'
 import ManagedPage from './components/ManagedPage'
 import Blog from './components/Blog'
-import FooterReviews from './components/FooterReviews'
 import Pricing from './components/Pricing'
 
-function WithNavbar({ children }) { return <><TopBar /><Navbar />{children}<FooterReviews /><Footer /></> }
+function WithNavbar({ children }) { return <SiteLayout>{children}</SiteLayout> }
 
 export default function App() {
   return <Routes>
