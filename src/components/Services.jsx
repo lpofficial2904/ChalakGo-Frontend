@@ -6,7 +6,7 @@ import { API_BASE } from '../utils/api.js'
 import { bookingConfirmation } from '../utils/bookingConfirmation.js'
 import { toast } from 'sonner'
 import { addressFields, addressFormValues, pickupPayload } from '../utils/location.js'
-import { calculateDistanceFare, calculateTemporaryDriverFare } from '../../../backend/utils/temporaryDriverFare.js'
+import { calculateDistanceFare, calculateMonthlyFare, calculateTemporaryDriverFare } from '../utils/fare.js'
 
 const defaultServices = [
   { slug: 'driver-only', name: 'Driver Only', price: '₹65/hr; ₹60/hr for 24 hours', eyebrow: 'YOUR CAR, OUR EXPERT DRIVER', detail: 'A trained, verified chauffeur drives your own car safely and professionally.', features: ['Background-verified driver', 'Live trip location updates', 'Hourly, daily, and weekly options'], image: 'https://images.unsplash.com/photo-1551830820-330a71b99659?auto=format&fit=crop&w=1200&q=85' },
