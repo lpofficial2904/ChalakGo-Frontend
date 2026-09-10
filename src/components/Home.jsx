@@ -1,65 +1,99 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowRight, CheckCircle2, Clock3, MapPin, ShieldCheck, Star } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { API_BASE } from '../utils/api.js'
+import { useLiveEffect } from "./LiveSite";
+import { assetUrl } from "../utils/assets.js";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  MapPin,
+  ShieldCheck,
+  Star,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import { API_BASE } from "../utils/api.js";
 
 const fallbackServices = [
   {
-    slug: 'driver-only',
-    name: 'Driver Only',
-    price: 'From ₹65/hr',
-    detail: 'A trained professional to drive your own car.',
+    slug: "driver-only",
+    name: "Driver Only",
+    price: "From ₹65/hr",
+    detail: "A trained professional to drive your own car.",
     image:
-      'https://images.unsplash.com/photo-1551830820-330a71b99659?auto=format&fit=crop&w=900&q=85',
+      "https://images.unsplash.com/photo-1551830820-330a71b99659?auto=format&fit=crop&w=900&q=85",
   },
   {
-    slug: 'car-driver',
-    name: 'Cab + Driver',
-    price: 'From ₹14/km',
-    detail: 'A clean car with a trusted driver for every journey.',
+    slug: "car-driver",
+    name: "Cab + Driver",
+    price: "From ₹14/km",
+    detail: "A clean car with a trusted driver for every journey.",
     image:
-      'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=85',
+      "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=85",
   },
   {
-    slug: 'permanent-driver',
-    name: 'Permanent Driver',
-    price: 'Monthly plans',
-    detail: 'A dependable driver matched to your daily routine.',
+    slug: "permanent-driver",
+    name: "Permanent Driver",
+    price: "Monthly plans",
+    detail: "A dependable driver matched to your daily routine.",
     image:
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=85',
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=85",
   },
-]
+];
 const fallbackHero =
-  'https://images.unsplash.com/photo-1598894000396-66c3f7212b6f?auto=format&fit=crop&w=1400&q=90'
+  "https://images.unsplash.com/photo-1598894000396-66c3f7212b6f?auto=format&fit=crop&w=1400&q=90";
 const reveal = {
   initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, amount: 0.2 },
+};
+
+function servicePriceLabel(service) {
+  if (service.pricingType === "distance" || service.slug === "car-driver") {
+    const rates = Object.values(service.vehicleRates || {}).filter(
+      (rate) => Number(rate) > 0,
+    );
+    return rates.length
+      ? `Cab fares from ₹${Math.min(...rates)}/km`
+      : "Cab fares available";
+  }
+  if (service.pricingType === "fixed" && service.tourPlans?.length)
+    return `Plans from ${service.tourPlans[0].price}`;
+  if (service.pricingType === "monthly" && service.monthlyRates) {
+    const rates = Object.values(service.monthlyRates).filter(
+      (rate) => Number(rate) > 0,
+    );
+    return rates.length
+      ? `Plans from ₹${Math.min(...rates).toLocaleString("en-IN")}/month`
+      : "Monthly plans";
+  }
+  return service.price || "Flexible pricing";
 }
 
 export default function Home() {
-  const [services, setServices] = useState(fallbackServices)
-  const [heroImage, setHeroImage] = useState(fallbackHero)
-  useEffect(() => {
+  const [services, setServices] = useState(fallbackServices);
+  const [heroImage, setHeroImage] = useState(fallbackHero);
+  useLiveEffect(() => {
     fetch(`${API_BASE}/api/services`)
       .then((response) => (response.ok ? response.json() : []))
       .then((items) => {
-        if (Array.isArray(items) && items.length) setServices(items)
+        if (Array.isArray(items) && items.length) setServices(items);
       })
-      .catch(() => {})
+      .catch(() => {});
     fetch(`${API_BASE}/api/settings`)
       .then((response) => (response.ok ? response.json() : null))
       .then((settings) => {
-        if (settings?.heroImage) setHeroImage(settings.heroImage)
+        if (settings?.heroImage) setHeroImage(settings.heroImage);
       })
-      .catch(() => {})
-  }, [])
+      .catch(() => {});
+  }, []);
 
   return (
     <main className="overflow-hidden bg-[#f6f9ff] text-[#10213f]">
       <section className="relative isolate bg-[#071a37] px-5 pb-16 pt-14 text-white sm:pb-24 sm:pt-20">
-        <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 overflow-hidden"
+        >
           <div className="absolute -left-28 -top-20 h-80 w-80 rounded-full bg-blue-500/25 blur-3xl" />
           <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-cyan-400/15 blur-3xl" />
           <div className="absolute inset-0 opacity-[.06] [background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)] [background-size:38px_38px]" />
@@ -71,14 +105,16 @@ export default function Home() {
             transition={{ duration: 0.6 }}
           >
             <p className="inline-flex items-center gap-2 rounded-full border border-blue-300/25 bg-white/10 px-4 py-2 text-xs font-extrabold tracking-[.14em] text-blue-100">
-              <ShieldCheck size={15} className="text-cyan-300" /> VERIFIED PROFESSIONAL DRIVERS
+              <ShieldCheck size={15} className="text-cyan-300" /> VERIFIED
+              PROFESSIONAL DRIVERS
             </p>
             <h1 className="mt-7 max-w-3xl text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl xl:text-7xl">
-              Your car. Our driver.<span className="block text-blue-300">Total peace of mind.</span>
+              Your car. Our driver.
+              <span className="block text-blue-300">Total peace of mind.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">
-              Professional, background-checked drivers for everyday travel, special occasions and
-              business journeys—whenever you need one.
+              Professional, background-checked drivers for everyday travel,
+              special occasions and business journeys—whenever you need one.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
@@ -109,14 +145,18 @@ export default function Home() {
             <div className="absolute -inset-4 rounded-[34px] bg-blue-400/15 blur-2xl" />
             <div className="relative overflow-hidden rounded-[30px] border border-white/15 shadow-2xl shadow-black/30">
               <img
-                src={heroImage}
+                src={assetUrl(heroImage)}
                 alt="ChalakGo professional driver service"
                 className="h-[380px] w-full object-cover sm:h-[510px]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#06142d]/75 via-transparent to-transparent" />
               <motion.div
                 animate={{ y: [0, -7, 0] }}
-                transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                transition={{
+                  duration: 3.2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
                 className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/20 bg-[#071a37]/75 p-4 backdrop-blur-md"
               >
                 <div className="flex items-center gap-3">
@@ -139,7 +179,7 @@ export default function Home() {
       <WhyChalakGo />
       <ContactPreview />
     </main>
-  )
+  );
 }
 
 function Trust({ value, label }) {
@@ -150,14 +190,17 @@ function Trust({ value, label }) {
         {label}
       </p>
     </div>
-  )
+  );
 }
 
 function ServicesPreview({ services }) {
   return (
     <section className="px-5 py-20 sm:py-28">
       <div className="mx-auto max-w-[1280px]">
-        <motion.div {...reveal} className="flex flex-wrap items-end justify-between gap-6">
+        <motion.div
+          {...reveal}
+          className="flex flex-wrap items-end justify-between gap-6"
+        >
           <div>
             <p className="text-sm font-extrabold tracking-[.14em] text-blue-600">
               CHOOSE YOUR SERVICE
@@ -183,18 +226,20 @@ function ServicesPreview({ services }) {
             >
               <div className="relative overflow-hidden">
                 <img
-                  src={service.image}
+                  src={assetUrl(service.image)}
                   alt={service.name}
                   className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#061a39]/70 via-transparent to-transparent" />
                 <p className="absolute bottom-4 left-5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-extrabold text-blue-700">
-                  {service.price || 'Flexible pricing'}
+                  {servicePriceLabel(service)}
                 </p>
               </div>
               <div className="p-7">
                 <h3 className="text-2xl font-extrabold">{service.name}</h3>
-                <p className="mt-3 min-h-12 text-sm leading-6 text-slate-500">{service.detail}</p>
+                <p className="mt-3 min-h-12 text-sm leading-6 text-slate-500">
+                  {service.detail}
+                </p>
                 <Link
                   to={`/services/${service.slug}`}
                   className="mt-6 inline-flex items-center gap-2 font-extrabold text-blue-600"
@@ -207,30 +252,40 @@ function ServicesPreview({ services }) {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function WhyChalakGo() {
   const points = [
     [
       ShieldCheck,
-      'Verified drivers',
-      'Every driver is identity-checked and professionally vetted.',
+      "Verified drivers",
+      "Every driver is identity-checked and professionally vetted.",
     ],
-    [Clock3, 'Book on your time', 'From a few hours to a dedicated monthly driver.'],
-    [Star, 'Service you can trust', 'Clear communication and support throughout your ride.'],
-  ]
+    [
+      Clock3,
+      "Book on your time",
+      "From a few hours to a dedicated monthly driver.",
+    ],
+    [
+      Star,
+      "Service you can trust",
+      "Clear communication and support throughout your ride.",
+    ],
+  ];
   return (
     <section className="bg-white px-5 py-20 sm:py-28">
       <div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
         <motion.div {...reveal}>
-          <p className="text-sm font-extrabold tracking-[.14em] text-blue-600">WHY CHALAKGO</p>
+          <p className="text-sm font-extrabold tracking-[.14em] text-blue-600">
+            WHY CHALAKGO
+          </p>
           <h2 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
             Comfort is better when trust comes first.
           </h2>
           <p className="mt-5 max-w-lg text-lg leading-8 text-slate-500">
-            We bring dependable drivers, transparent service and thoughtful support together in one
-            simple booking experience.
+            We bring dependable drivers, transparent service and thoughtful
+            support together in one simple booking experience.
           </p>
           <Link
             to="/about"
@@ -257,7 +312,7 @@ function WhyChalakGo() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function ContactPreview() {
@@ -283,7 +338,8 @@ function ContactPreview() {
             Need help choosing a service?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg leading-7 text-slate-300">
-            Talk to our team for the right driver, timing and plan for your journey.
+            Talk to our team for the right driver, timing and plan for your
+            journey.
           </p>
           <Link
             to="/contact"
@@ -294,5 +350,5 @@ function ContactPreview() {
         </div>
       </motion.div>
     </section>
-  )
+  );
 }

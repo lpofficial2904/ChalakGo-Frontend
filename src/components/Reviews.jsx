@@ -1,27 +1,36 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { MessageCircle, ShieldCheck, Star } from 'lucide-react'
-import PageLayout from './PageLayout'
-import { API_BASE } from '../utils/api.js'
+import { useLiveEffect } from "./LiveSite";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { MessageCircle, ShieldCheck, Star } from "lucide-react";
+import PageLayout from "./PageLayout";
+import { API_BASE } from "../utils/api.js";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, amount: 0.15 },
-}
+};
 
 export default function Reviews() {
-  const [reviews, setReviews] = useState([])
-  const [message, setMessage] = useState('')
+  const [reviews, setReviews] = useState([]);
+  const [message, setMessage] = useState("");
 
-  useEffect(() => {
+  useLiveEffect(() => {
     fetch(`${API_BASE}/api/reviews`)
       .then((response) => (response.ok ? response.json() : Promise.reject()))
       .then((items) =>
-        setReviews([...new Map(items.map((review) => [String(review._id), review])).values()])
+        setReviews([
+          ...new Map(
+            items.map((review) => [String(review._id), review]),
+          ).values(),
+        ]),
       )
-      .catch(() => setMessage('Customer stories will appear here once they are published.'))
-  }, [])
+      .catch(() =>
+        setMessage(
+          "Customer stories will appear here once they are published.",
+        ),
+      );
+  }, []);
 
   return (
     <PageLayout>
@@ -35,16 +44,21 @@ export default function Reviews() {
             aria-hidden="true"
             className="absolute -bottom-28 right-0 h-96 w-96 rounded-full bg-cyan-400/15 blur-3xl"
           />
-          <motion.div {...reveal} className="relative mx-auto max-w-3xl text-center">
+          <motion.div
+            {...reveal}
+            className="relative mx-auto max-w-3xl text-center"
+          >
             <p className="inline-flex items-center gap-2 rounded-full border border-blue-300/25 bg-white/10 px-4 py-2 text-xs font-extrabold tracking-[.14em] text-blue-100">
-              <MessageCircle size={15} className="text-cyan-300" /> CUSTOMER STORIES
+              <MessageCircle size={15} className="text-cyan-300" /> CUSTOMER
+              STORIES
             </p>
             <h1 className="mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl">
-              Trusted by people who <span className="text-blue-300">value every journey.</span>
+              Trusted by people who{" "}
+              <span className="text-blue-300">value every journey.</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-              Real experiences from customers who choose ChalakGo for dependable, professional
-              driving support.
+              Real experiences from customers who choose ChalakGo for
+              dependable, professional driving support.
             </p>
           </motion.div>
         </section>
@@ -73,13 +87,13 @@ export default function Reviews() {
             {...reveal}
             className="mt-14 flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-slate-600"
           >
-            <ShieldCheck size={19} className="text-emerald-600" /> Reviews are managed and published
-            by ChalakGo.
+            <ShieldCheck size={19} className="text-emerald-600" /> Reviews are
+            managed and published by ChalakGo.
           </motion.div>
         </section>
       </main>
     </PageLayout>
-  )
+  );
 }
 
 function Trust({ value, label }) {
@@ -88,22 +102,29 @@ function Trust({ value, label }) {
       <p className="text-xl font-extrabold text-[#10213f]">{value}</p>
       <p className="mt-1 text-xs font-semibold text-slate-500">{label}</p>
     </div>
-  )
+  );
 }
 
 function ReviewCard({ review, index }) {
-  const rating = Math.min(5, Math.max(1, Number(review.rating) || 5))
-  const initial = review.customerName?.trim()?.charAt(0)?.toUpperCase() || 'C'
+  const rating = Math.min(5, Math.max(1, Number(review.rating) || 5));
+  const initial = review.customerName?.trim()?.charAt(0)?.toUpperCase() || "C";
   return (
     <motion.article
       {...reveal}
       transition={{ delay: index * 0.06 }}
       className="relative flex min-h-[280px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-[0_12px_35px_rgba(25,54,96,.08)]"
     >
-      <MessageCircle aria-hidden="true" className="absolute right-6 top-6 h-14 w-14 text-blue-50" />
+      <MessageCircle
+        aria-hidden="true"
+        className="absolute right-6 top-6 h-14 w-14 text-blue-50"
+      />
       <div className="relative flex gap-1 text-amber-400">
         {Array.from({ length: 5 }, (_, star) => (
-          <Star key={star} size={17} fill={star < rating ? 'currentColor' : 'none'} />
+          <Star
+            key={star}
+            size={17}
+            fill={star < rating ? "currentColor" : "none"}
+          />
         ))}
       </div>
       <p className="relative mt-6 flex-1 text-[15px] leading-7 text-slate-600">
@@ -122,13 +143,15 @@ function ReviewCard({ review, index }) {
           )}
         </div>
         <div className="min-w-0">
-          <h2 className="truncate font-extrabold text-[#10213f]">{review.customerName}</h2>
+          <h2 className="truncate font-extrabold text-[#10213f]">
+            {review.customerName}
+          </h2>
           <p className="mt-0.5 truncate text-xs text-slate-500">
-            {[review.designation, review.company].filter(Boolean).join(' · ') ||
-              'ChalakGo customer'}
+            {[review.designation, review.company].filter(Boolean).join(" · ") ||
+              "ChalakGo customer"}
           </p>
         </div>
       </div>
     </motion.article>
-  )
+  );
 }

@@ -1,3 +1,5 @@
+import { useLiveEffect } from './LiveSite'
+import { assetUrl } from '../utils/assets.js'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { API_BASE } from '../utils/api.js'
@@ -27,12 +29,15 @@ export default function Blog() {
   const [post, setPost] = useState(null)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    const path = slug ? `/api/blogs/${encodeURIComponent(slug)}` : '/api/blogs'
+  useLiveEffect(() => {
+    const path = slug ? `/api/blogs/${encodeURIComponent(slug)}` : "/api/blogs";
 
     fetchJson(path)
-      .then((data) => (slug ? setPost(data) : setPosts(data)))
-      .catch((requestError) => setError(requestError.message))
+      .then((data) => {
+        setError("");
+        return slug ? setPost(data) : setPosts(data);
+      })
+      .catch((requestError) => setError(requestError.message));
   }, [slug])
 
   if (error)
@@ -74,7 +79,7 @@ function BlogList({ posts }) {
 function BlogCard({ post }) {
   return (
     <article className="overflow-hidden rounded-3xl border bg-white shadow-sm">
-      <img src={post.coverImage || fallbackImage} alt="" className="h-48 w-full object-cover" />
+      <img src={assetUrl(post.coverImage || fallbackImage)} alt="" className="h-48 w-full object-cover" />
       <div className="p-7">
         <p className="text-sm font-semibold text-blue-600">
           {formatDate(post.publishedAt)} · {post.author || 'ChalakGo Team'}
@@ -103,7 +108,7 @@ function BlogPost({ post }) {
         {post.excerpt && <p className="mt-6 text-xl leading-8 text-slate-500">{post.excerpt}</p>}
         {post.coverImage && (
           <img
-            src={post.coverImage}
+            src={assetUrl(post.coverImage)}
             alt=""
             className="mt-10 h-72 w-full rounded-3xl object-cover sm:h-[440px]"
           />

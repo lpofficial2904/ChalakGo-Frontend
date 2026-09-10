@@ -1,74 +1,96 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowRight, Clock3, Mail, MapPin, Phone, Send, ShieldCheck } from 'lucide-react'
-import { toast } from 'sonner'
-import { API_BASE } from '../utils/api.js'
+import { useLiveEffect } from "./LiveSite";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Clock3,
+  Mail,
+  MapPin,
+  Phone,
+  Send,
+  ShieldCheck,
+} from "lucide-react";
+import { toast } from "sonner";
+import { API_BASE } from "../utils/api.js";
 
 const fallback = {
-  phone: '+91 98765 43210',
-  email: 'support@chalakgo.in',
-  address: 'Virasat Homes, Narayan Vihar, Jaipur, Rajasthan, India',
-}
+  phone: "+91 98765 43210",
+  email: "support@chalakgo.in",
+  address: "Virasat Homes, Narayan Vihar, Jaipur, Rajasthan, India",
+};
 const reveal = {
   initial: { opacity: 0, y: 26 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, amount: 0.2 },
-}
+};
 
 export default function Contact() {
-  const [settings, setSettings] = useState(fallback)
-  const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' })
-  const [sending, setSending] = useState(false)
-  useEffect(() => {
+  const [settings, setSettings] = useState(fallback);
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    message: "",
+  });
+  const [sending, setSending] = useState(false);
+  useLiveEffect(() => {
     fetch(`${API_BASE}/api/settings`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((x) => x && setSettings((value) => ({ ...fallback, ...value, ...x })))
-      .catch(() => {})
-  }, [])
+      .then(
+        (x) => x && setSettings((value) => ({ ...fallback, ...value, ...x })),
+      )
+      .catch(() => {});
+  }, []);
   const update = (event) =>
     setForm((value) => ({
       ...value,
       [event.target.name]:
-        event.target.name === 'phone'
-          ? event.target.value.replace(/\D/g, '').slice(0, 10)
+        event.target.name === "phone"
+          ? event.target.value.replace(/\D/g, "").slice(0, 10)
           : event.target.value,
-    }))
+    }));
   const submit = async (event) => {
-    event.preventDefault()
-    setSending(true)
+    event.preventDefault();
+    setSending(true);
     try {
       const response = await fetch(`${API_BASE}/api/contacts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
-      })
-      const data = await response.json()
-      if (!response.ok) throw Error(data.message)
-      setForm({ name: '', phone: '', email: '', message: '' })
+      });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.message);
+      setForm({ name: "", phone: "", email: "", message: "" });
       if (data.emailSent) {
-        toast.success('Message sent successfully.', {
-          description: 'Our team will contact you shortly.',
-        })
+        toast.success("Message sent successfully.", {
+          description: "Our team will contact you shortly.",
+        });
       } else {
-        toast.warning('Message saved, but email notification is unavailable.', {
-          description: 'Our team can still view your message in the admin panel.',
-        })
+        toast.warning("Message saved, but email notification is unavailable.", {
+          description:
+            "Our team can still view your message in the admin panel.",
+        });
       }
     } catch (error) {
-      toast.error('Message could not be sent.', {
-        description: error.message || 'Please try again in a moment.',
-      })
+      toast.error("Message could not be sent.", {
+        description: error.message || "Please try again in a moment.",
+      });
     } finally {
-      setSending(false)
+      setSending(false);
     }
-  }
+  };
   const details = [
-    [Phone, 'Call us', settings.phone, `tel:${(settings.phone || '').replace(/\s/g, '')}`],
-    [Mail, 'Email us', settings.email, `mailto:${settings.email}`],
-    [MapPin, 'Visit us', settings.address],
-    [Clock3, 'Always available', '24/7 booking assistance'],
-  ]
-  const mapQuery = encodeURIComponent(settings.address || fallback.address)
+    [
+      Phone,
+      "Call us",
+      settings.phone,
+      `tel:${(settings.phone || "").replace(/\s/g, "")}`,
+    ],
+    [Mail, "Email us", settings.email, `mailto:${settings.email}`],
+    [MapPin, "Visit us", settings.address],
+    [Clock3, "Always available", "24/7 booking assistance"],
+  ];
+  const mapQuery = encodeURIComponent("Mansarovar, Jaipur, Rajasthan, India");
 
   return (
     <main className="overflow-hidden bg-[#f6f9ff] text-[#10213f]">
@@ -90,11 +112,12 @@ export default function Contact() {
             <ShieldCheck size={15} className="text-cyan-300" /> CHALAKGO SUPPORT
           </p>
           <h1 className="mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl">
-            Let&rsquo;s plan your <span className="text-blue-300">next journey.</span>
+            Let&rsquo;s plan your{" "}
+            <span className="text-blue-300">next journey.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-            Whether you need a driver today or a long-term plan, our team is ready to help you
-            choose with confidence.
+            Whether you need a driver today or a long-term plan, our team is
+            ready to help you choose with confidence.
           </p>
         </motion.div>
       </section>
@@ -107,10 +130,12 @@ export default function Contact() {
             <p className="text-xs font-extrabold tracking-[.14em] text-blue-200">
               WAYS TO REACH US
             </p>
-            <h2 className="mt-3 text-3xl font-extrabold">Talk to a ChalakGo specialist.</h2>
+            <h2 className="mt-3 text-3xl font-extrabold">
+              Talk to a ChalakGo specialist.
+            </h2>
             <p className="mt-4 leading-7 text-slate-300">
-              Tell us about your route, timing and service needs. We&rsquo;ll guide you to the right
-              option.
+              Tell us about your route, timing and service needs. We&rsquo;ll
+              guide you to the right option.
             </p>
             <div className="mt-8 space-y-5">
               {details.map(([Icon, title, text, href]) => {
@@ -121,10 +146,12 @@ export default function Contact() {
                     </span>
                     <span>
                       <b className="block text-sm text-white">{title}</b>
-                      <span className="mt-1 block text-sm leading-5 text-blue-100">{text}</span>
+                      <span className="mt-1 block text-sm leading-5 text-blue-100">
+                        {text}
+                      </span>
                     </span>
                   </>
-                )
+                );
                 return href ? (
                   <a
                     key={title}
@@ -137,7 +164,7 @@ export default function Contact() {
                   <div key={title} className="flex items-start gap-3">
                     {content}
                   </div>
-                )
+                );
               })}
             </div>
             <div className="mt-9 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-6 text-blue-100">
@@ -150,9 +177,13 @@ export default function Contact() {
             onSubmit={submit}
             className="rounded-3xl border border-slate-200 bg-white p-7 shadow-[0_16px_45px_rgba(25,54,96,.10)] sm:p-10"
           >
-            <p className="text-xs font-extrabold tracking-[.14em] text-blue-600">SEND A MESSAGE</p>
+            <p className="text-xs font-extrabold tracking-[.14em] text-blue-600">
+              SEND A MESSAGE
+            </p>
             <h2 className="mt-3 text-3xl font-extrabold">How can we help?</h2>
-            <p className="mt-2 text-slate-500">We usually respond quickly during working hours.</p>
+            <p className="mt-2 text-slate-500">
+              We usually respond quickly during working hours.
+            </p>
             <div className="mt-8 grid gap-5 sm:grid-cols-2">
               <label className="text-sm font-extrabold">
                 Your name
@@ -206,16 +237,26 @@ export default function Contact() {
               disabled={sending}
               className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-extrabold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 disabled:opacity-60"
             >
-              {sending ? 'Sending your message…' : 'Send message'} <Send size={18} />
+              {sending ? "Sending your message…" : "Send message"}{" "}
+              <Send size={18} />
             </button>
           </motion.form>
         </div>
-        <motion.section {...reveal} className="mt-12 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_16px_45px_rgba(25,54,96,.10)]">
+        <motion.section
+          {...reveal}
+          className="mt-12 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_16px_45px_rgba(25,54,96,.10)]"
+        >
           <div className="flex flex-wrap items-center justify-between gap-3 px-7 py-6 sm:px-9">
             <div>
-              <p className="text-xs font-extrabold tracking-[.14em] text-blue-600">FIND US</p>
-              <h2 className="mt-2 text-2xl font-extrabold text-[#10213f]">Our Jaipur office</h2>
-              <p className="mt-1 text-sm text-slate-500">{settings.address || fallback.address}</p>
+              <p className="text-xs font-extrabold tracking-[.14em] text-blue-600">
+                FIND US
+              </p>
+              <h2 className="mt-2 text-2xl font-extrabold text-[#10213f]">
+                Find us in Mansarovar, Jaipur
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Mansarovar, Jaipur, Rajasthan, India
+              </p>
             </div>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${mapQuery}`}
@@ -227,7 +268,7 @@ export default function Contact() {
             </a>
           </div>
           <iframe
-            title="ChalakGo Jaipur office map"
+            title="Mansarovar Jaipur map"
             src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
             className="h-72 w-full border-0 sm:h-96"
             loading="lazy"
@@ -239,7 +280,9 @@ export default function Contact() {
           className="mt-12 flex flex-col items-center justify-between gap-5 rounded-3xl border border-blue-100 bg-blue-50 px-7 py-6 text-center sm:flex-row sm:text-left"
         >
           <div>
-            <p className="font-extrabold text-[#10213f]">Ready to book instead?</p>
+            <p className="font-extrabold text-[#10213f]">
+              Ready to book instead?
+            </p>
             <p className="mt-1 text-sm text-slate-600">
               Browse services and send a booking request in a few simple steps.
             </p>
@@ -253,5 +296,5 @@ export default function Contact() {
         </motion.div>
       </section>
     </main>
-  )
+  );
 }

@@ -1,39 +1,50 @@
-import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { API_BASE } from '../utils/api.js'
+import { useLiveEffect } from "./LiveSite";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { API_BASE } from "../utils/api.js";
 
-const reviewsPerSlide = 3
+const reviewsPerSlide = 3;
 
 export default function FooterReviews() {
-  const [reviews, setReviews] = useState([])
-  const [slide, setSlide] = useState(0)
+  const [reviews, setReviews] = useState([]);
+  const [slide, setSlide] = useState(0);
 
-  useEffect(() => {
+  useLiveEffect(() => {
     fetch(`${API_BASE}/api/reviews`)
       .then((response) => (response.ok ? response.json() : []))
       .then(setReviews)
-      .catch(() => setReviews([]))
-  }, [])
+      .catch(() => setReviews([]));
+  }, []);
 
-  const uniqueReviews = [...new Map(reviews.map((review) => [String(review._id), review])).values()]
+  const uniqueReviews = [
+    ...new Map(reviews.map((review) => [String(review._id), review])).values(),
+  ];
   const slides = useMemo(
     () =>
-      Array.from({ length: Math.ceil(uniqueReviews.length / reviewsPerSlide) }, (_, index) =>
-        uniqueReviews.slice(index * reviewsPerSlide, index * reviewsPerSlide + reviewsPerSlide)
+      Array.from(
+        { length: Math.ceil(uniqueReviews.length / reviewsPerSlide) },
+        (_, index) =>
+          uniqueReviews.slice(
+            index * reviewsPerSlide,
+            index * reviewsPerSlide + reviewsPerSlide,
+          ),
       ),
-    [uniqueReviews]
-  )
+    [uniqueReviews],
+  );
   useEffect(() => {
-    setSlide((current) => Math.min(current, Math.max(0, slides.length - 1)))
-  }, [slides.length])
+    setSlide((current) => Math.min(current, Math.max(0, slides.length - 1)));
+  }, [slides.length]);
   useEffect(() => {
-    if (slides.length < 2) return
-    const timer = setInterval(() => setSlide((current) => (current + 1) % slides.length), 5000)
-    return () => clearInterval(timer)
-  }, [slides.length])
+    if (slides.length < 2) return;
+    const timer = setInterval(
+      () => setSlide((current) => (current + 1) % slides.length),
+      5000,
+    );
+    return () => clearInterval(timer);
+  }, [slides.length]);
 
-  if (!uniqueReviews.length) return null
-  const visibleReviews = slides[slide] || []
+  if (!uniqueReviews.length) return null;
+  const visibleReviews = slides[slide] || [];
 
   return (
     <section className="bg-[#f5f8fd] px-5 py-12 sm:py-14">
@@ -52,8 +63,12 @@ export default function FooterReviews() {
         <div className="mt-8 overflow-hidden">
           <div className="grid gap-5 md:grid-cols-3">
             {visibleReviews.map((review, index) => {
-              const rating = Math.min(5, Math.max(1, Number(review.rating) || 5))
-              const initial = review.customerName?.trim()?.charAt(0)?.toUpperCase() || 'C'
+              const rating = Math.min(
+                5,
+                Math.max(1, Number(review.rating) || 5),
+              );
+              const initial =
+                review.customerName?.trim()?.charAt(0)?.toUpperCase() || "C";
               return (
                 <motion.article
                   key={`${slide}-${review._id}`}
@@ -71,7 +86,7 @@ export default function FooterReviews() {
                   <div className="relative flex items-center justify-between">
                     <div className="flex gap-0.5 text-sm text-amber-400">
                       {Array.from({ length: 5 }, (_, star) => (
-                        <span key={star}>{star < rating ? '★' : '☆'}</span>
+                        <span key={star}>{star < rating ? "★" : "☆"}</span>
                       ))}
                     </div>
                     <span className="rounded-full bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-600">
@@ -96,15 +111,17 @@ export default function FooterReviews() {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <b className="block truncate text-sm text-[#10213f]">{review.customerName}</b>
+                      <b className="block truncate text-sm text-[#10213f]">
+                        {review.customerName}
+                      </b>
                       <p className="truncate text-xs text-slate-500">
                         {review.designation}
-                        {review.company ? ` · ${review.company}` : ''}
+                        {review.company ? ` · ${review.company}` : ""}
                       </p>
                     </div>
                   </div>
                 </motion.article>
-              )
+              );
             })}
           </div>
         </div>
@@ -116,12 +133,12 @@ export default function FooterReviews() {
                 type="button"
                 aria-label={`Show review slide ${index + 1}`}
                 onClick={() => setSlide(index)}
-                className={`h-2 rounded-full transition-all ${slide === index ? 'w-7 bg-blue-600' : 'w-2 bg-blue-200'}`}
+                className={`h-2 rounded-full transition-all ${slide === index ? "w-7 bg-blue-600" : "w-2 bg-blue-200"}`}
               />
             ))}
           </div>
         )}
       </div>
     </section>
-  )
+  );
 }

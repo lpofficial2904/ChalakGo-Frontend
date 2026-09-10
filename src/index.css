@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 :root {
   color: #10213f;
@@ -21,7 +21,7 @@ body {
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
-    'Segoe UI',
+    "Segoe UI",
     sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -36,7 +36,7 @@ body.mobile-nav-open {
     display: none !important;
   }
 }
-button[class*='bg-blue-600'][class*='text-blue-700'] {
+button[class*="bg-blue-600"][class*="text-blue-700"] {
   color: white !important;
 }
 @media (max-width: 767px) {
@@ -102,7 +102,7 @@ button[class*='bg-blue-600'][class*='text-blue-700'] {
     visibility: hidden;
     pointer-events: none;
   }
-  body.mobile-nav-open header.sticky button[aria-expanded='true'] {
+  body.mobile-nav-open header.sticky button[aria-expanded="true"] {
     position: fixed;
     top: 14px;
     right: 14px;
@@ -159,7 +159,7 @@ select:focus-visible {
   transform: scaleX(0);
   border-radius: 99px;
   background: #1463e8;
-  content: '';
+  content: "";
   transition: transform 0.2s ease;
 }
 .nav-link:hover::after {
@@ -193,23 +193,23 @@ select:focus-visible {
 }
 
 /* Shared commercial visual language for all existing pages. */
-:where([class~='bg-[#f7f9fc]']) {
+:where([class~="bg-[#f7f9fc]"]) {
   background:
     radial-gradient(circle at 88% 8%, #e4efff 0, transparent 26rem),
     radial-gradient(circle at 4% 45%, #edf7ff 0, transparent 23rem), #f6f8fc !important;
 }
-:where([class~='bg-[#090f20]']) {
+:where([class~="bg-[#090f20]"]) {
   background:
     radial-gradient(circle at 50% -10%, #173c78 0, transparent 34rem),
     linear-gradient(135deg, #081328, #0d1d3a) !important;
 }
-:where([class~='bg-blue-600']) {
+:where([class~="bg-blue-600"]) {
   background-color: #1463e8 !important;
 }
-:where([class~='text-blue-600']) {
+:where([class~="text-blue-600"]) {
   color: #1463e8 !important;
 }
-:where([class~='text-[#101a31]']) {
+:where([class~="text-[#101a31]"]) {
   color: #10213f !important;
 }
 section {
@@ -219,11 +219,11 @@ section {
   background: #c8dcff;
   color: #10213f;
 }
-section[class*='f5f8fd'] > div {
+section[class*="f5f8fd"] > div {
   max-width: 980px !important;
 }
 @media (min-width: 768px) {
-  section[class*='f5f8fd'] .grid {
+  section[class*="f5f8fd"] .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 }

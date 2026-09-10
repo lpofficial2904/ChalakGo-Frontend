@@ -1,123 +1,130 @@
-import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
-import defaultLogo from '../assets/Chalakgo logo.png'
-import { ChevronDown, LogOut, UserRound } from 'lucide-react'
-import { toast } from 'sonner'
-import { API_BASE } from '../utils/api.js'
-import { clearUserSession, tokenExpiryDelay } from '../utils/session.js'
+import { useLiveEffect } from "./LiveSite";
+import { assetUrl } from "../utils/assets.js";
+import { useEffect, useState } from "react";
+import { SiteLink as Link, SiteNavLink as NavLink } from "./LiveSite";
+import defaultLogo from "../assets/Chalakgo logo.png";
+import { ChevronDown, LogOut, UserRound } from "lucide-react";
+import { toast } from "sonner";
+import { API_BASE } from "../utils/api.js";
+import { clearUserSession, tokenExpiryDelay } from "../utils/session.js";
 
 const menuLinks = [
-  ['Home', '/'],
-  ['About', '/about'],
-  ['Pricing', '/pricing'],
-  ['Blog', '/blog'],
-  ['Contact', '/contact'],
-]
-const desktopLink = ({ isActive }) => `nav-link ${isActive ? 'text-blue-600' : ''}`
+  ["Home", "/"],
+  ["About", "/about"],
+  ["Pricing", "/pricing"],
+  ["Blog", "/blog"],
+  ["Contact", "/contact"],
+];
+const desktopLink = ({ isActive }) =>
+  `nav-link ${isActive ? "text-blue-600" : ""}`;
 const fallbackServices = [
-  { slug: 'driver-only', name: 'Driver Only' },
-  { slug: 'car-driver', name: 'Car + Driver' },
-  { slug: 'permanent-driver', name: 'Permanent Driver' },
-]
+  { slug: "driver-only", name: "Driver Only" },
+  { slug: "car-driver", name: "Car + Driver" },
+  { slug: "permanent-driver", name: "Permanent Driver" },
+];
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false)
-  const [services, setServices] = useState(fallbackServices)
-  const [pages, setPages] = useState([])
+  const [open, setOpen] = useState(false);
+  const [services, setServices] = useState(fallbackServices);
+  const [pages, setPages] = useState([]);
   const [brand, setBrand] = useState({
-    siteName: 'ChalakGo',
-    logo: '',
-    navbarLogo: '',
-    mainFavicon: '',
-  })
+    siteName: "ChalakGo",
+    logo: "",
+    navbarLogo: "",
+    mainFavicon: "",
+  });
   const [user, setUser] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('chalakgo_user') || 'null')
+      return JSON.parse(localStorage.getItem("chalakgo_user") || "null");
     } catch {
-      return null
+      return null;
     }
-  })
-  const [userMenu, setUserMenu] = useState(false)
+  });
+  const [userMenu, setUserMenu] = useState(false);
 
   // Published admin services are the source of truth for this menu.
-  useEffect(() => {
+  useLiveEffect(() => {
     fetch(`${API_BASE}/api/services`)
       .then((r) => (r.ok ? r.json() : null))
       .then((items) => {
-        if (Array.isArray(items)) setServices(items)
+        if (Array.isArray(items)) setServices(items);
       })
-      .catch(() => {})
-  }, [])
-  useEffect(() => {
+      .catch(() => {});
+  }, []);
+  useLiveEffect(() => {
     fetch(`${API_BASE}/api/pages`)
       .then((r) => (r.ok ? r.json() : null))
       .then((items) => {
-        if (Array.isArray(items)) setPages(items)
+        if (Array.isArray(items)) setPages(items);
       })
-      .catch(() => {})
-  }, [])
-  useEffect(() => {
-    fetch(`${API_BASE}/api/settings`, { credentials: 'include' })
+      .catch(() => {});
+  }, []);
+  useLiveEffect(() => {
+    fetch(`${API_BASE}/api/settings`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
       .then((x) => x && setBrand((v) => ({ ...v, ...x })))
-      .catch(() => {})
-  }, [])
+      .catch(() => {});
+  }, []);
   useEffect(() => {
     const token =
-      localStorage.getItem('chalakgo_user_token') || sessionStorage.getItem('chalakgo_user_token')
+      localStorage.getItem("chalakgo_user_token") ||
+      sessionStorage.getItem("chalakgo_user_token");
     // Guests do not have a session, so do not make an unnecessary /me request.
-    if (!token) return
-    const expiryDelay = tokenExpiryDelay(token)
+    if (!token) return;
+    const expiryDelay = tokenExpiryDelay(token);
     if (!expiryDelay) {
-      clearUserSession()
-      setUser(null)
-      return
+      clearUserSession();
+      setUser(null);
+      return;
     }
     const expiryTimer = window.setTimeout(() => {
-      clearUserSession()
-      setUser(null)
-      window.location.href = '/login'
-    }, expiryDelay)
+      clearUserSession();
+      setUser(null);
+      window.location.href = "/login";
+    }, expiryDelay);
     fetch(`${API_BASE}/api/users/me`, {
-      credentials: 'include',
+      credentials: "include",
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
         if (data?.user) {
-          setUser(data.user)
-          localStorage.setItem('chalakgo_user', JSON.stringify(data.user))
-          return
+          setUser(data.user);
+          localStorage.setItem("chalakgo_user", JSON.stringify(data.user));
+          return;
         }
-        clearUserSession()
-        setUser(null)
+        clearUserSession();
+        setUser(null);
       })
-      .catch(() => {})
-      return () => window.clearTimeout(expiryTimer)
-  }, [])
+      .catch(() => {});
+    return () => window.clearTimeout(expiryTimer);
+  }, []);
   useEffect(() => {
-    document.body.classList.toggle('mobile-nav-open', open)
-    return () => document.body.classList.remove('mobile-nav-open')
-  }, [open])
+    document.body.classList.toggle("mobile-nav-open", open);
+    return () => document.body.classList.remove("mobile-nav-open");
+  }, [open]);
   useEffect(() => {
-    const icon = document.querySelector("link[rel='icon']")
-    if (icon) icon.href = brand.mainFavicon || '/favicon.svg'
-  }, [brand.mainFavicon])
+    const icon = document.querySelector("link[rel='icon']");
+    if (icon) icon.href = assetUrl(brand.mainFavicon) || "/favicon.svg";
+  }, [brand.mainFavicon]);
 
   const close = () => {
-    setOpen(false)
-    setUserMenu(false)
-  }
+    setOpen(false);
+    setUserMenu(false);
+  };
   const logout = async () => {
     try {
-      await fetch(`${API_BASE}/api/users/logout`, { method: 'POST', credentials: 'include' })
+      await fetch(`${API_BASE}/api/users/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
     } finally {
-      clearUserSession()
-      setUser(null)
-      toast.success('You have been logged out.')
-      close()
+      clearUserSession();
+      setUser(null);
+      toast.success("You have been logged out.");
+      close();
     }
-  }
+  };
   const serviceLinks = (className) =>
     services.map((service) => (
       <Link
@@ -128,14 +135,14 @@ export default function Navbar() {
       >
         {service.name}
       </Link>
-    ))
+    ));
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white text-[#10213f] shadow-sm">
       <nav className="mx-auto flex h-[72px] max-w-[1380px] items-center justify-between px-4 lg:px-12">
         <Link to="/" onClick={close} className="flex items-center">
           <img
-            src={brand.navbarLogo || brand.logo || defaultLogo}
+            src={assetUrl(brand.navbarLogo || brand.logo || defaultLogo)}
             alt={brand.siteName}
             className="h-10 w-auto sm:h-11"
           />
@@ -153,7 +160,7 @@ export default function Navbar() {
               className="flex items-center gap-1 py-6 hover:text-blue-600"
               aria-haspopup="true"
             >
-              Services{' '}
+              Services{" "}
               <span aria-hidden="true" className="text-xs">
                 ⌄
               </span>
@@ -165,7 +172,9 @@ export default function Navbar() {
               >
                 All services
               </Link>
-              {serviceLinks('block rounded-lg px-3 py-2.5 hover:bg-blue-50 hover:text-blue-600')}
+              {serviceLinks(
+                "block rounded-lg px-3 py-2.5 hover:bg-blue-50 hover:text-blue-600",
+              )}
             </div>
           </div>
           <NavLink to="/pricing" className={desktopLink}>
@@ -175,7 +184,11 @@ export default function Navbar() {
             Blog
           </NavLink>
           {pages.map((page) => (
-            <NavLink key={page.slug} to={`/p/${page.slug}`} className={desktopLink}>
+            <NavLink
+              key={page.slug}
+              to={`/p/${page.slug}`}
+              className={desktopLink}
+            >
               {page.navigationLabel || page.title}
             </NavLink>
           ))}
@@ -199,16 +212,18 @@ export default function Navbar() {
                 className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-3 text-sm font-bold text-slate-700"
               >
                 <UserRound size={16} />
-                {user.fullName?.split(' ')[0] || 'Account'}
+                {user.fullName?.split(" ")[0] || "Account"}
                 <ChevronDown
                   size={15}
-                  className={userMenu ? 'rotate-180 transition' : 'transition'}
+                  className={userMenu ? "rotate-180 transition" : "transition"}
                 />
               </button>
               {userMenu && (
                 <div className="absolute right-0 top-[calc(100%+8px)] z-[120] w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
                   <div className="border-b border-slate-100 px-3 py-3">
-                    <p className="font-bold text-[#10213f]">{user.fullName || 'Customer'}</p>
+                    <p className="font-bold text-[#10213f]">
+                      {user.fullName || "Customer"}
+                    </p>
                     <p className="mt-1 truncate text-xs text-slate-500">
                       {user.email || user.mobile}
                     </p>
@@ -238,10 +253,10 @@ export default function Navbar() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-menu"
-          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-label={open ? "Close menu" : "Open menu"}
           className="mobile-menu-button grid h-11 w-11 place-items-center rounded-xl border border-slate-200 text-2xl font-bold"
         >
-          {open ? '×' : '☰'}
+          {open ? "×" : "☰"}
         </button>
       </nav>
       {open && (
@@ -270,7 +285,7 @@ export default function Navbar() {
             </Link>
             <div className="grid gap-1 border-l-2 border-blue-200 pl-3">
               {serviceLinks(
-                'rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-blue-50'
+                "rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-blue-50",
               )}
             </div>
             {menuLinks.slice(2).map(([name, path]) => (
@@ -295,8 +310,10 @@ export default function Navbar() {
             ))}
             {user && (
               <div className="rounded-xl bg-slate-50 px-4 py-3">
-                <p className="font-bold">{user.fullName || 'Customer'}</p>
-                <p className="mt-1 text-xs text-slate-500">{user.email || user.mobile}</p>
+                <p className="font-bold">{user.fullName || "Customer"}</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {user.email || user.mobile}
+                </p>
                 <button
                   type="button"
                   onClick={logout}
@@ -308,26 +325,26 @@ export default function Navbar() {
               </div>
             )}
           </div>
-            <div className="mobile-drawer-actions">
+          <div className="mobile-drawer-actions">
+            <Link
+              to="/services"
+              onClick={close}
+              className="mobile-book-button rounded-xl bg-blue-600 text-center font-bold text-white"
+            >
+              Book Now
+            </Link>
+            {!user && (
               <Link
-                to="/services"
+                to="/login"
                 onClick={close}
-                className="mobile-book-button rounded-xl bg-blue-600 text-center font-bold text-white"
+                className="rounded-xl border border-slate-300 bg-white text-center font-bold"
               >
-                Book Now
+                Login
               </Link>
-              {!user && (
-                <Link
-                  to="/login"
-                  onClick={close}
-                  className="rounded-xl border border-slate-300 bg-white text-center font-bold"
-                >
-                  Login
-                </Link>
-              )}
-            </div>
+            )}
+          </div>
         </div>
       )}
     </header>
-  )
+  );
 }
