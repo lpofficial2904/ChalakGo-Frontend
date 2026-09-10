@@ -106,6 +106,20 @@ test("edited address values are submitted with original GPS coordinates", () => 
   assert.equal(manual.pickup.coordinates, undefined);
 });
 
+test("coordinate fallback can populate required pickup fields", () => {
+  const coordinates = { latitude: 26.8541128, longitude: 75.7235878, accuracy: 20 };
+  const fallbackAddress = `Latitude: ${coordinates.latitude}, Longitude: ${coordinates.longitude}`;
+  const payload = pickupPayload(
+    { address: fallbackAddress },
+    "current",
+    coordinates,
+    12345,
+  );
+  assert.equal(payload.pickup.formattedAddress, fallbackAddress);
+  assert.equal(payload.pickupLocation, fallbackAddress);
+  assert.equal(payload.pickupAddress, fallbackAddress);
+});
+
 test("requests fresh high accuracy fix once and preserves device precision", async () => {
   const coords = {
     latitude: 12.3456789,

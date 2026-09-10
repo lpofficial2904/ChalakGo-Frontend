@@ -36,8 +36,18 @@ const pickupPayload = (form, source, coordinates, timestamp) => {
           .join(", ");
   return {
     address,
-    ...buildPickupPayload({ ...form, address }, source, coordinates, timestamp),
+    // Reverse geocoding may be unavailable on a customer's phone.  Keep the
+    // GPS-coordinate address in every required pickup field in that case.
+    ...buildPickupPayload({ ...form, address: form.address || address }, source, coordinates, timestamp),
   };
+};
+
+const signedInUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("chalakgo_user") || "null") || {};
+  } catch {
+    return {};
+  }
 };
 
 const defaultServices = [
@@ -480,6 +490,15 @@ function TourBookingForm({ service, plan }) {
     state: "",
     ...draft?.form,
   });
+  useEffect(() => {
+    const user = signedInUser();
+    setForm((old) => ({
+      ...old,
+      fullName: old.fullName || user.fullName || "",
+      phone: old.phone || user.mobile || "",
+      email: old.email || user.email || "",
+    }));
+  }, []);
   const [locationMode, setLocationMode] = useState(
     draft?.locationMode || "manual",
   );
@@ -852,6 +871,15 @@ function BookingForm({ service }) {
     endTime: "",
     ...draft?.form,
   });
+  useEffect(() => {
+    const user = signedInUser();
+    setForm((old) => ({
+      ...old,
+      fullName: old.fullName || user.fullName || "",
+      phone: old.phone || user.mobile || "",
+      email: old.email || user.email || "",
+    }));
+  }, []);
 
   useEffect(() => {
     if (draft) return;
