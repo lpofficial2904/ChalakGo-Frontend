@@ -7,7 +7,7 @@ export function assetUrl(value) {
     try {
       const url = new URL(value);
       if (
-        ["chalakgo.onrender.com", "localhost", "127.0.0.1"].includes(
+        ["api.chalakgo.com", "chalakgo.onrender.com", "localhost", "127.0.0.1"].includes(
           url.hostname,
         ) &&
         url.pathname.startsWith("/uploads/")
