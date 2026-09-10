@@ -7,7 +7,7 @@ import useCurrentLocation from "./useCurrentLocation";
 const defaults = {
   topBarMessage:
     "Professional drivers for every journey · 24/7 booking support",
-  phone: "+91 98765 43210",
+  phone: "+91 97845 10845",
 };
 
 export default function TopBar() {

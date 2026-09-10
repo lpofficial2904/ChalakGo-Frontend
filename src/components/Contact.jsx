@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { API_BASE } from "../utils/api.js";
 
 const fallback = {
-  phone: "+91 98765 43210",
+  phone: "+91 97845 10845",
   email: "support@chalakgo.in",
   address: "Virasat Homes, Narayan Vihar, Jaipur, Rajasthan, India",
 };
