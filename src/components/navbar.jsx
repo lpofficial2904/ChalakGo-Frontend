@@ -164,7 +164,8 @@ export default function Navbar() {
       <nav className="mx-auto flex h-[72px] max-w-[1380px] items-center justify-between px-4 lg:px-12">
         <Link to="/" onClick={close} className="flex items-center">
           <img
-            src={assetUrl(brand.navbarLogo || brand.logo || defaultLogo)}
+            src={assetUrl(brand.navbarLogo) || assetUrl(brand.logo) || defaultLogo}
+            onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = defaultLogo; }}
             alt={brand.siteName}
             className="h-10 w-auto sm:h-11"
           />

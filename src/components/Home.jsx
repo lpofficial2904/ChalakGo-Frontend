@@ -82,7 +82,7 @@ export default function Home() {
     fetch(`${API_BASE}/api/settings`)
       .then((response) => (response.ok ? response.json() : null))
       .then((settings) => {
-        if (settings?.heroImage) setHeroImage(settings.heroImage);
+        setHeroImage(assetUrl(settings?.heroImage) || fallbackHero);
       })
       .catch(() => {});
   }, []);
@@ -145,7 +145,8 @@ export default function Home() {
             <div className="absolute -inset-4 rounded-[34px] bg-blue-400/15 blur-2xl" />
             <div className="relative overflow-hidden rounded-[30px] border border-white/15 shadow-2xl shadow-black/30">
               <img
-                src={assetUrl(heroImage)}
+                src={assetUrl(heroImage) || fallbackHero}
+                onError={() => setHeroImage(fallbackHero)}
                 alt="ChalakGo professional driver service"
                 className="h-[380px] w-full object-cover sm:h-[510px]"
               />
