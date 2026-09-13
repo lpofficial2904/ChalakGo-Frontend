@@ -15,6 +15,7 @@ import Reviews from "./components/Reviews";
 import Services from "./components/Services";
 import SiteLayout from "./components/SiteLayout";
 import { API_BASE } from "./utils/api.js";
+import { usePageSeo } from "./components/Seo.jsx";
 
 // Every visitor page shares the same header, navigation, and footer.
 function PublicPage({ children, showFooterReviews = true }) {
@@ -49,6 +50,8 @@ function editableRoute(path, slug, Page, options = {}) {
 
 function EditablePage({ slug, Page, showFooterReviews = true }) {
   const [page, setPage] = useState(null);
+  const metadata = page?.slug === slug ? page : null;
+  usePageSeo({ title: metadata?.seoTitle || (!metadata?.statusOnly && metadata?.title), description: metadata?.seoDescription || metadata?.excerpt });
   useLiveEffect(() => {
     const controller = new AbortController();
     // Built-in pages work without a published CMS override. Look up optional
@@ -121,6 +124,7 @@ export default function App() {
       {editableRoute("/fleet", "fleet", Fleet, { showFooterReviews: false })}
       <Route path="/reviews" element={<Reviews />} />
       {editableRoute("/faqs", "faqs", Faqs, { showFooterReviews: false })}
+      {publicRoute("*", () => <main className="px-5 py-24 text-center"><h1 className="text-4xl font-bold">Page not found</h1><a href="/">Return home</a></main>)}
     </Routes>
   );
 }

@@ -1,4 +1,5 @@
 import { useLiveEffect } from './LiveSite'
+import { usePageSeo } from './Seo.jsx'
 import { assetUrl } from '../utils/assets.js'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -16,8 +17,8 @@ function formatDate(value) {
   })
 }
 
-async function fetchJson(path) {
-  const response = await fetch(`${API_BASE}${path}`)
+async function fetchJson(path, signal) {
+  const response = await fetch(`${API_BASE}${path}`, { signal })
   const data = await response.json()
   if (!response.ok) throw new Error(data.message || 'Unable to load blog posts.')
   return data
@@ -28,16 +29,23 @@ export default function Blog() {
   const [posts, setPosts] = useState([])
   const [post, setPost] = useState(null)
   const [error, setError] = useState('')
+  const metadata = slug && post?.slug === slug ? post : null
+  usePageSeo({ title: error ? 'Blog Unavailable' : metadata?.title, description: metadata?.excerpt || metadata?.content, image: metadata?.coverImage ? assetUrl(metadata.coverImage) : undefined, type: metadata ? 'article' : 'website', noindex: Boolean(error) })
 
   useLiveEffect(() => {
+    const controller = new AbortController();
+    setError('');
+    setPost(null);
     const path = slug ? `/api/blogs/${encodeURIComponent(slug)}` : "/api/blogs";
 
-    fetchJson(path)
+    fetchJson(path, controller.signal)
       .then((data) => {
+        if (controller.signal.aborted) return;
         setError("");
         return slug ? setPost(data) : setPosts(data);
       })
-      .catch((requestError) => setError(requestError.message));
+      .catch((requestError) => { if (!controller.signal.aborted) setError(requestError.message); });
+    return () => controller.abort();
   }, [slug])
 
   if (error)

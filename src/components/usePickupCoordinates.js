@@ -10,7 +10,13 @@ export default function usePickupCoordinates(initial = null) {
   });
   const pending = useRef(null);
   const controller = useRef(null);
-  useEffect(() => () => controller.current?.abort(), []);
+  useEffect(() => () => {
+    controller.current?.abort();
+    // StrictMode runs setup again immediately after cleanup. Never let the
+    // next setup reuse the aborted promise and leave loading stuck forever.
+    controller.current = null;
+    pending.current = null;
+  }, []);
   const fetchLocation = useCallback(() => {
     if (pending.current) return pending.current;
     controller.current = new AbortController();
@@ -36,7 +42,9 @@ export default function usePickupCoordinates(initial = null) {
           error:
             error.code === 1
               ? "Allow location access or enter your location manually."
-              : "Could not detect location. Please retry or enter it manually.",
+              : error.code === 3
+                ? "Location detection timed out. Check device location services, then retry or enter your pickup manually."
+                : "Could not detect location. Please retry or enter it manually.",
         };
       }
       if (!signal.aborted) setState(result);

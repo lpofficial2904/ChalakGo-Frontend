@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-The frontend expects the API at `http://127.0.0.1:5000` in local development. Vite forwards `/api` requests to that address.
+Frontend and admin use `https://api.chalakgo.com` in development and production. Restart Vite after changing environment files. API calls use VPS data; a local backend is not required.
 
 ## Project map
 

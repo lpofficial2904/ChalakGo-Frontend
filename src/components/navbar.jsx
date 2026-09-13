@@ -6,7 +6,7 @@ import defaultLogo from "../assets/Chalakgo logo.png";
 import { ChevronDown, LogOut, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { API_BASE } from "../utils/api.js";
-import { clearUserSession, tokenExpiryDelay } from "../utils/session.js";
+import { clearUserSession, tokenExpiryDelay, USER_SESSION_EVENT } from "../utils/session.js";
 
 const menuLinks = [
   ["Home", "/"],
@@ -40,6 +40,23 @@ export default function Navbar() {
       return null;
     }
   });
+  const readToken = () => localStorage.getItem("chalakgo_user_token") || sessionStorage.getItem("chalakgo_user_token");
+  const [sessionToken, setSessionToken] = useState(readToken);
+  useEffect(() => {
+    const syncSession = () => {
+      const token = readToken();
+      setSessionToken(token);
+      try { setUser(token ? JSON.parse(localStorage.getItem("chalakgo_user") || "null") : null); }
+      catch { setUser(null); }
+    };
+    window.addEventListener(USER_SESSION_EVENT, syncSession);
+    window.addEventListener("storage", syncSession);
+    syncSession();
+    return () => {
+      window.removeEventListener(USER_SESSION_EVENT, syncSession);
+      window.removeEventListener("storage", syncSession);
+    };
+  }, []);
   const [userMenu, setUserMenu] = useState(false);
 
   // Published admin services are the source of truth for this menu.
@@ -66,9 +83,8 @@ export default function Navbar() {
       .catch(() => {});
   }, []);
   useEffect(() => {
-    const token =
-      localStorage.getItem("chalakgo_user_token") ||
-      sessionStorage.getItem("chalakgo_user_token");
+    const token = sessionToken;
+    const controller = new AbortController();
     // Guests do not have a session, so do not make an unnecessary /me request.
     if (!token) return;
     const expiryDelay = tokenExpiryDelay(token);
@@ -83,11 +99,17 @@ export default function Navbar() {
       window.location.href = "/login";
     }, expiryDelay);
     fetch(`${API_BASE}/api/users/me`, {
+      signal: controller.signal,
       credentials: "include",
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((response) => (response.ok ? response.json() : null))
+      .then((response) => {
+        if (response.ok) return response.json();
+        if (response.status === 401 || response.status === 403) return null;
+        throw new Error("Session check unavailable");
+      })
       .then((data) => {
+        if (controller.signal.aborted || readToken() !== token) return;
         if (data?.user) {
           setUser(data.user);
           localStorage.setItem("chalakgo_user", JSON.stringify(data.user));
@@ -97,8 +119,8 @@ export default function Navbar() {
         setUser(null);
       })
       .catch(() => {});
-    return () => window.clearTimeout(expiryTimer);
-  }, []);
+    return () => { controller.abort(); window.clearTimeout(expiryTimer); };
+  }, [sessionToken]);
   useEffect(() => {
     document.body.classList.toggle("mobile-nav-open", open);
     return () => document.body.classList.remove("mobile-nav-open");

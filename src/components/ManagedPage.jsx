@@ -1,4 +1,5 @@
 import { API_BASE } from "../utils/api.js";
+import { usePageSeo } from "./Seo.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -8,17 +9,23 @@ export default function ManagedPage() {
   const [page, setPage] = useState(null);
 
   const [error, setError] = useState("");
+  const metadata = page?.slug === slug ? page : null;
+  usePageSeo({ title: error ? "Page Unavailable" : metadata?.seoTitle || metadata?.title, description: metadata?.seoDescription || metadata?.excerpt, noindex: Boolean(error) });
 
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/pages/${encodeURIComponent(slug)}`)
+    const controller = new AbortController();
+    setError("");
+    setPage(null);
+    fetch(`${API_BASE}/api/pages/${encodeURIComponent(slug)}`, { signal: controller.signal })
       .then(async (response) => {
         const data = await response.json();
+        if (controller.signal.aborted) return;
         if (!response.ok) throw new Error(data.message);
         setError("");
         setPage(data);
-        document.title = data.seoTitle || data.title;
       })
-      .catch((e) => setError(e.message));
+      .catch((e) => { if (!controller.signal.aborted) setError(e.message); });
+    return () => controller.abort();
   }, [slug]);
   if (error)
     return (

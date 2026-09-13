@@ -1,4 +1,5 @@
 import { useLiveEffect } from "./LiveSite";
+import { usePageSeo } from "./Seo.jsx";
 import { assetUrl } from "../utils/assets.js";
 import CabPricing from "./CabPricing";
 import {
@@ -164,6 +165,7 @@ export default function Services() {
       .catch(() => {});
   }, []);
   const selected = services.find((item) => item.slug === slug);
+  usePageSeo({ title: selected?.name, description: selected?.detail, image: selected?.image ? assetUrl(selected.image) : undefined });
   return selected ? (
     <ServiceDetails service={selected} />
   ) : (

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { API_BASE } from "../utils/api.js";
+import { UnavailableSeo } from "./Seo.jsx";
 const Context = createContext({ revision: "", statuses: [] });
 export function LiveSite({ children }) {
   const [revision, setRevision] = useState("");
@@ -63,6 +64,7 @@ export function PageStatusGate({ children }) {
   const { pathname } = useLocation();
   return isInactive(pathname, statuses) ? (
     <main className="min-h-screen bg-slate-50 px-5 py-24 text-center text-slate-700">
+      <UnavailableSeo />
       <h1 className="text-3xl font-bold">This page is currently unavailable</h1>
       <p className="mt-4">Please explore our other services.</p>
       <SiteLink to="/services" className="mt-6 inline-block text-blue-600">
