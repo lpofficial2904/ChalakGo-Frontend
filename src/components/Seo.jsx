@@ -30,7 +30,7 @@ export function SeoProvider({ children }) {
   const name = data.title || fallback[0];
   const title = name.includes("ChalakGo") ? name : `${name} | ChalakGo`;
   const description = (data.description || fallback[1]).replace(/\s+/g, " ").trim().slice(0, 180);
-  const canonical = `https://chalakgo.com/#${path}`;
+  const canonical = `https://chalakgo.com${path}`;
   const image = new URL(data.image || logo, "https://chalakgo.com").href;
   const noindex = data.noindex || path === "/login" || (!pages[path] && !dynamic);
   return (

@@ -288,7 +288,7 @@ export default function Contact() {
             </p>
           </div>
           <a
-            href="/#/services"
+            href="/services"
             className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#102651] px-5 py-3 text-sm font-extrabold text-white"
           >
             View services <ArrowRight size={17} />

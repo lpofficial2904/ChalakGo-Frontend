@@ -57,6 +57,7 @@ export default function Navbar() {
       window.removeEventListener("storage", syncSession);
     };
   }, []);
+  const navbarPages = pages.filter(page => page.slug !== "terms-and-conditions");
   const [userMenu, setUserMenu] = useState(false);
 
   // Published admin services are the source of truth for this menu.
@@ -96,7 +97,7 @@ export default function Navbar() {
     const expiryTimer = window.setTimeout(() => {
       clearUserSession();
       setUser(null);
-      window.location.href = "/#/login";
+      window.location.href = "/login";
     }, expiryDelay);
     fetch(`${API_BASE}/api/users/me`, {
       signal: controller.signal,
@@ -206,7 +207,7 @@ export default function Navbar() {
           <NavLink to="/blog" className={desktopLink}>
             Blog
           </NavLink>
-          {pages.map((page) => (
+          {navbarPages.map((page) => (
             <NavLink
               key={page.slug}
               to={`/p/${page.slug}`}
@@ -321,7 +322,7 @@ export default function Navbar() {
                 {name}
               </Link>
             ))}
-            {pages.map((page) => (
+            {navbarPages.map((page) => (
               <Link
                 key={page.slug}
                 to={`/p/${page.slug}`}

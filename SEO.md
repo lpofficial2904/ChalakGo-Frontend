@@ -3,10 +3,10 @@
 The customer app uses `react-helmet-async` 3 with React 19. `SeoProvider` in
 `src/components/Seo.jsx` owns one Helmet instance so nested pages do not create
 duplicate metadata. It provides route titles, descriptions, canonical URLs,
-Open Graph and Twitter tags. Canonicals use https://chalakgo.com/#/ with the route path, excluding query
-parameters and in-page anchors. Frontend and admin use HashRouter to support
-refresh on static hosting. Share the new /#/ URLs; old /path URLs still need
-a server redirect or SPA fallback if bookmarked.
+Open Graph and Twitter tags. Canonicals use https://chalakgo.com with clean route paths, excluding query
+parameters and in-page anchors. Frontend and admin use BrowserRouter. Configure
+nginx to serve index.html for client routes so direct links and refresh work.
+Old /#/ bookmarks are migrated to clean paths before React starts.
 
 Use `usePageSeo({ title, description, image, type, noindex })` in a page to
 override its defaults. Blog articles and service pages use their loaded content.

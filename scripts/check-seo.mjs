@@ -22,7 +22,7 @@ try {
     }, React.createElement(SeoProvider)));
     assert.equal((html.match(/<title>/g) || []).length, 1, path);
     assert.equal((html.match(/name="description"/g) || []).length, 1, path);
-    assert.ok(html.includes(`href="https://chalakgo.com/#${path}"`), path);
+    assert.ok(html.includes(`href="https://chalakgo.com${path}"`), path);
     assert.ok(html.includes('property="og:title"'), path);
     assert.ok(html.includes('name="twitter:card"'), path);
     const robots = ["/login", "/missing"].includes(path) ? "noindex, nofollow" : "index, follow";
