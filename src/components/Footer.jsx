@@ -112,6 +112,7 @@ export default function Footer() {
               ["Pricing", "/pricing"],
               ["Blog", "/blog"],
               ["Contact", "/contact"],
+              ["Terms & Conditions", "/terms-and-conditions"],
             ]}
           />
           <FooterColumn

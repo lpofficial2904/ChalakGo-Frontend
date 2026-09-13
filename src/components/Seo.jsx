@@ -15,6 +15,7 @@ const pages = {
   "/fleet": ["Our Fleet", "Explore vehicle options for comfortable travel with ChalakGo."],
   "/reviews": ["Customer Reviews", "Read customer experiences and reviews of ChalakGo driver services."],
   "/faqs": ["Frequently Asked Questions", "Find answers about ChalakGo driver bookings, pricing, services and travel."],
+  "/terms-and-conditions": ["Terms & Conditions", "Read the terms for ChalakGo driver hiring, cab bookings, service fees and replacement support."],
   "/login": ["Customer Login", "Log in to ChalakGo to book a driver and manage your bookings."],
 };
 
@@ -29,7 +30,7 @@ export function SeoProvider({ children }) {
   const name = data.title || fallback[0];
   const title = name.includes("ChalakGo") ? name : `${name} | ChalakGo`;
   const description = (data.description || fallback[1]).replace(/\s+/g, " ").trim().slice(0, 180);
-  const canonical = `https://chalakgo.com${path === "/" ? "/" : path}`;
+  const canonical = `https://chalakgo.com/#${path}`;
   const image = new URL(data.image || logo, "https://chalakgo.com").href;
   const noindex = data.noindex || path === "/login" || (!pages[path] && !dynamic);
   return (

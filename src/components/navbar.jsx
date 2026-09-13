@@ -96,7 +96,7 @@ export default function Navbar() {
     const expiryTimer = window.setTimeout(() => {
       clearUserSession();
       setUser(null);
-      window.location.href = "/login";
+      window.location.href = "/#/login";
     }, expiryDelay);
     fetch(`${API_BASE}/api/users/me`, {
       signal: controller.signal,

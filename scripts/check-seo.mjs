@@ -15,20 +15,20 @@ const server = await createServer({
 });
 try {
   const { SeoProvider } = await server.ssrLoadModule("/src/components/Seo.jsx");
-  const paths = ["/", "/about", "/contact", "/pricing", "/services", "/blog", "/how-it-works", "/fleet", "/reviews", "/faqs", "/login", "/missing"];
+  const paths = ["/", "/about", "/contact", "/pricing", "/services", "/blog", "/how-it-works", "/fleet", "/reviews", "/faqs", "/terms-and-conditions", "/login", "/missing"];
   for (const path of paths) {
     const html = renderToStaticMarkup(React.createElement(MemoryRouter, {
       initialEntries: [path + "?utm_source=test#section"],
     }, React.createElement(SeoProvider)));
     assert.equal((html.match(/<title>/g) || []).length, 1, path);
     assert.equal((html.match(/name="description"/g) || []).length, 1, path);
-    assert.ok(html.includes(`href="https://chalakgo.com${path}"`), path);
+    assert.ok(html.includes(`href="https://chalakgo.com/#${path}"`), path);
     assert.ok(html.includes('property="og:title"'), path);
     assert.ok(html.includes('name="twitter:card"'), path);
     const robots = ["/login", "/missing"].includes(path) ? "noindex, nofollow" : "index, follow";
     assert.ok(html.includes(`content="${robots}"`), path);
   }
-  console.log("PASS: 12 routes, unique metadata, clean canonicals, social tags and noindex.");
+  console.log("PASS: 13 routes, unique metadata, clean canonicals, social tags and noindex.");
 } finally {
   await server.close();
 }

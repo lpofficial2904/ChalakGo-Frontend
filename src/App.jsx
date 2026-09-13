@@ -16,6 +16,7 @@ import Services from "./components/Services";
 import SiteLayout from "./components/SiteLayout";
 import { API_BASE } from "./utils/api.js";
 import { usePageSeo } from "./components/Seo.jsx";
+import Terms from "./components/Terms.jsx";
 
 // Every visitor page shares the same header, navigation, and footer.
 function PublicPage({ children, showFooterReviews = true }) {
@@ -72,6 +73,8 @@ function EditablePage({ slug, Page, showFooterReviews = true }) {
       });
     return () => controller.abort();
   }, [slug]);
+  if (slug === "terms-and-conditions")
+    return <PublicPage showFooterReviews={false}><Terms page={metadata?.statusOnly ? null : metadata} /></PublicPage>;
   if (!page || page.statusOnly)
     return (
       <PublicPage showFooterReviews={showFooterReviews}>
@@ -110,6 +113,7 @@ export default function App() {
       {editableRoute("/", "home", Home)}
       {editableRoute("/about", "about", About)}
       {editableRoute("/contact", "contact", Contact)}
+      {editableRoute("/terms-and-conditions", "terms-and-conditions", Terms, { showFooterReviews: false })}
       {publicRoute("/login", Login, { showFooterReviews: false })}
       {editableRoute("/pricing", "pricing", Pricing)}
       {publicRoute("/services", Services)}

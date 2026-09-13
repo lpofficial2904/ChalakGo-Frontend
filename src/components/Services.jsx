@@ -9,7 +9,7 @@ import {
 } from "../utils/bookingDraft.js";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import useCurrentLocation from "./usePickupCoordinates";
 import { API_BASE } from "../utils/api.js";
 import { bookingConfirmation } from "../utils/bookingConfirmation.js";
@@ -470,15 +470,16 @@ function JaipurTour({ service }) {
 }
 
 function TourBookingForm({ service, plan }) {
+  const { hash } = useLocation();
   useEffect(() => {
-    if (window.location.hash !== "#booking") return;
+    if (hash !== "#booking") return;
     const timer = setTimeout(
       () =>
         document.getElementById("booking")?.scrollIntoView({ block: "start" }),
       100,
     );
     return () => clearTimeout(timer);
-  }, []);
+  }, [hash]);
   const draft = useRef(readBookingDraft(service.slug)).current;
   const navigate = useNavigate();
   const { coordinates, timestamp, loading, error, label, fetchLocation } =
@@ -805,15 +806,16 @@ function PermanentInfo({ service }) {
 }
 
 function BookingForm({ service }) {
+  const { hash } = useLocation();
   useEffect(() => {
-    if (window.location.hash !== "#booking") return;
+    if (hash !== "#booking") return;
     const timer = setTimeout(
       () =>
         document.getElementById("booking")?.scrollIntoView({ block: "start" }),
       100,
     );
     return () => clearTimeout(timer);
-  }, []);
+  }, [hash]);
   const draft = useRef(readBookingDraft(service.slug)).current;
   const navigate = useNavigate();
   const {
