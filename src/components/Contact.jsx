@@ -1,3 +1,4 @@
+import { PageText } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -109,16 +110,16 @@ export default function Contact() {
           className="relative mx-auto max-w-3xl text-center"
         >
           <p className="inline-flex items-center gap-2 rounded-full border border-blue-300/25 bg-white/10 px-4 py-2 text-xs font-extrabold tracking-[.14em] text-blue-100">
-            <ShieldCheck size={15} className="text-cyan-300" /> CHALAKGO SUPPORT
-          </p>
+            <ShieldCheck size={15} className="text-cyan-300" /><PageText id="text_1"> CHALAKGO SUPPORT
+          </PageText></p>
           <h1 className="mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl">
             Let&rsquo;s plan your{" "}
-            <span className="text-blue-300">next journey.</span>
+            <span className="text-blue-300"><PageText id="text_2">next journey.</PageText></span>
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300"><PageText id="text_3">
             Whether you need a driver today or a long-term plan, our team is
             ready to help you choose with confidence.
-          </p>
+          </PageText></p>
         </motion.div>
       </section>
       <section className="relative mx-auto max-w-[1180px] px-5 pb-20 sm:pb-28">
@@ -127,12 +128,12 @@ export default function Contact() {
             {...reveal}
             className="-mt-10 rounded-3xl bg-[#102651] p-7 text-white shadow-2xl shadow-blue-950/20 sm:p-9"
           >
-            <p className="text-xs font-extrabold tracking-[.14em] text-blue-200">
+            <p className="text-xs font-extrabold tracking-[.14em] text-blue-200"><PageText id="text_4">
               WAYS TO REACH US
-            </p>
-            <h2 className="mt-3 text-3xl font-extrabold">
+            </PageText></p>
+            <h2 className="mt-3 text-3xl font-extrabold"><PageText id="text_5">
               Talk to a ChalakGo specialist.
-            </h2>
+            </PageText></h2>
             <p className="mt-4 leading-7 text-slate-300">
               Tell us about your route, timing and service needs. We&rsquo;ll
               guide you to the right option.
@@ -167,9 +168,9 @@ export default function Contact() {
                 );
               })}
             </div>
-            <div className="mt-9 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-6 text-blue-100">
+            <div className="mt-9 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-6 text-blue-100"><PageText id="text_6">
               Your details are used only to respond to your request.
-            </div>
+            </PageText></div>
           </motion.aside>
           <motion.form
             {...reveal}
@@ -177,17 +178,17 @@ export default function Contact() {
             onSubmit={submit}
             className="rounded-3xl border border-slate-200 bg-white p-7 shadow-[0_16px_45px_rgba(25,54,96,.10)] sm:p-10"
           >
-            <p className="text-xs font-extrabold tracking-[.14em] text-blue-600">
+            <p className="text-xs font-extrabold tracking-[.14em] text-blue-600"><PageText id="text_7">
               SEND A MESSAGE
-            </p>
-            <h2 className="mt-3 text-3xl font-extrabold">How can we help?</h2>
-            <p className="mt-2 text-slate-500">
+            </PageText></p>
+            <h2 className="mt-3 text-3xl font-extrabold"><PageText id="text_8">How can we help?</PageText></h2>
+            <p className="mt-2 text-slate-500"><PageText id="text_9">
               We usually respond quickly during working hours.
-            </p>
+            </PageText></p>
             <div className="mt-8 grid gap-5 sm:grid-cols-2">
-              <label className="text-sm font-extrabold">
+              <label className="text-sm font-extrabold"><PageText id="text_10">
                 Your name
-                <input
+                </PageText><input
                   className="input"
                   name="name"
                   value={form.name}
@@ -196,9 +197,9 @@ export default function Contact() {
                   required
                 />
               </label>
-              <label className="text-sm font-extrabold">
+              <label className="text-sm font-extrabold"><PageText id="text_11">
                 Mobile number
-                <input
+                </PageText><input
                   className="input"
                   name="phone"
                   value={form.phone}
@@ -209,9 +210,9 @@ export default function Contact() {
                   required
                 />
               </label>
-              <label className="text-sm font-extrabold sm:col-span-2">
+              <label className="text-sm font-extrabold sm:col-span-2"><PageText id="text_12">
                 Email address
-                <input
+                </PageText><input
                   className="input"
                   name="email"
                   type="email"
@@ -221,9 +222,9 @@ export default function Contact() {
                   required
                 />
               </label>
-              <label className="text-sm font-extrabold sm:col-span-2">
+              <label className="text-sm font-extrabold sm:col-span-2"><PageText id="text_13">
                 Your message
-                <textarea
+                </PageText><textarea
                   className="input min-h-32 py-3"
                   name="message"
                   value={form.message}
@@ -248,23 +249,23 @@ export default function Contact() {
         >
           <div className="flex flex-wrap items-center justify-between gap-3 px-7 py-6 sm:px-9">
             <div>
-              <p className="text-xs font-extrabold tracking-[.14em] text-blue-600">
+              <p className="text-xs font-extrabold tracking-[.14em] text-blue-600"><PageText id="text_14">
                 FIND US
-              </p>
-              <h2 className="mt-2 text-2xl font-extrabold text-[#10213f]">
+              </PageText></p>
+              <h2 className="mt-2 text-2xl font-extrabold text-[#10213f]"><PageText id="text_15">
                 Find us in Mansarovar, Jaipur
-              </h2>
-              <p className="mt-1 text-sm text-slate-500">
+              </PageText></h2>
+              <p className="mt-1 text-sm text-slate-500"><PageText id="text_16">
                 Mansarovar, Jaipur, Rajasthan, India
-              </p>
+              </PageText></p>
             </div>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${mapQuery}`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-blue-700"
-            >
-              Open in Google Maps <MapPin size={17} />
+            ><PageText id="text_17">
+              Open in Google Maps </PageText><MapPin size={17} />
             </a>
           </div>
           <iframe
@@ -280,18 +281,18 @@ export default function Contact() {
           className="mt-12 flex flex-col items-center justify-between gap-5 rounded-3xl border border-blue-100 bg-blue-50 px-7 py-6 text-center sm:flex-row sm:text-left"
         >
           <div>
-            <p className="font-extrabold text-[#10213f]">
+            <p className="font-extrabold text-[#10213f]"><PageText id="text_18">
               Ready to book instead?
-            </p>
-            <p className="mt-1 text-sm text-slate-600">
+            </PageText></p>
+            <p className="mt-1 text-sm text-slate-600"><PageText id="text_19">
               Browse services and send a booking request in a few simple steps.
-            </p>
+            </PageText></p>
           </div>
           <a
             href="/services"
             className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#102651] px-5 py-3 text-sm font-extrabold text-white"
-          >
-            View services <ArrowRight size={17} />
+          ><PageText id="text_20">
+            View services </PageText><ArrowRight size={17} />
           </a>
         </motion.div>
       </section>

@@ -1,6 +1,7 @@
+import { PageText, PageCopyContext } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { assetUrl } from "../utils/assets.js";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -70,13 +71,14 @@ function servicePriceLabel(service) {
 }
 
 export default function Home() {
+  const copy = useContext(PageCopyContext);
   const [services, setServices] = useState(fallbackServices);
   const [heroImage, setHeroImage] = useState(fallbackHero);
   useLiveEffect(() => {
     fetch(`${API_BASE}/api/services`)
       .then((response) => (response.ok ? response.json() : []))
       .then((items) => {
-        if (Array.isArray(items) && items.length) setServices(items);
+        if (Array.isArray(items)) setServices(items);
       })
       .catch(() => {});
     fetch(`${API_BASE}/api/settings`)
@@ -105,35 +107,35 @@ export default function Home() {
             transition={{ duration: 0.6 }}
           >
             <p className="inline-flex items-center gap-2 rounded-full border border-blue-300/25 bg-white/10 px-4 py-2 text-xs font-extrabold tracking-[.14em] text-blue-100">
-              <ShieldCheck size={15} className="text-cyan-300" /> VERIFIED
+              <ShieldCheck size={15} className="text-cyan-300" /><PageText id="text_1"> VERIFIED
               PROFESSIONAL DRIVERS
-            </p>
-            <h1 className="mt-7 max-w-3xl text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl xl:text-7xl">
+            </PageText></p>
+            <h1 className="mt-7 max-w-3xl text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl xl:text-7xl"><PageText id="text_2">
               Your car. Our driver.
-              <span className="block text-blue-300">Total peace of mind.</span>
+              </PageText><span className="block text-blue-300"><PageText id="text_3">Total peace of mind.</PageText></span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">
+            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-300"><PageText id="text_4">
               Professional, background-checked drivers for everyday travel,
               special occasions and business journeys—whenever you need one.
-            </p>
+            </PageText></p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
                 to="/services"
                 className="inline-flex items-center gap-2 rounded-xl bg-blue-500 px-6 py-4 font-extrabold text-white shadow-lg shadow-blue-950/30 transition hover:-translate-y-0.5 hover:bg-blue-400"
-              >
-                Book a driver <ArrowRight size={18} />
+              ><PageText id="text_5">
+                Book a driver </PageText><ArrowRight size={18} />
               </Link>
               <Link
                 to="/pricing"
                 className="rounded-xl border border-white/20 bg-white/5 px-6 py-4 font-extrabold text-white transition hover:bg-white/10"
-              >
+              ><PageText id="text_6">
                 View pricing
-              </Link>
+              </PageText></Link>
             </div>
             <div className="mt-11 grid max-w-xl grid-cols-3 gap-3 border-t border-white/10 pt-7">
-              <Trust value="50K+" label="Trips completed" />
-              <Trust value="4.9/5" label="Customer rating" />
-              <Trust value="24/7" label="Booking support" />
+              <Trust value={<PageText id="statTrips">50K+</PageText>} label={<PageText id="statTripsLabel">Trips completed</PageText>} />
+              <Trust value={<PageText id="statRating">4.9/5</PageText>} label={<PageText id="statRatingLabel">Customer rating</PageText>} />
+              <Trust value={<PageText id="statSupport">24/7</PageText>} label={<PageText id="statSupportLabel">Booking support</PageText>} />
             </div>
           </motion.div>
           <motion.div
@@ -145,8 +147,8 @@ export default function Home() {
             <div className="absolute -inset-4 rounded-[34px] bg-blue-400/15 blur-2xl" />
             <div className="relative overflow-hidden rounded-[30px] border border-white/15 shadow-2xl shadow-black/30">
               <img
-                src={assetUrl(heroImage) || fallbackHero}
-                onError={() => setHeroImage(fallbackHero)}
+                src={assetUrl(copy.heroImage || heroImage) || fallbackHero}
+                onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackHero; }}
                 alt="ChalakGo professional driver service"
                 className="h-[380px] w-full object-cover sm:h-[510px]"
               />
@@ -165,10 +167,10 @@ export default function Home() {
                     <MapPin size={20} />
                   </span>
                   <div>
-                    <p className="font-extrabold">Trusted on every route</p>
-                    <p className="mt-0.5 text-xs text-blue-100">
+                    <p className="font-extrabold"><PageText id="text_7">Trusted on every route</PageText></p>
+                    <p className="mt-0.5 text-xs text-blue-100"><PageText id="text_8">
                       Live updates from pickup to drop-off
-                    </p>
+                    </PageText></p>
                   </div>
                 </div>
               </motion.div>
@@ -203,18 +205,18 @@ function ServicesPreview({ services }) {
           className="flex flex-wrap items-end justify-between gap-6"
         >
           <div>
-            <p className="text-sm font-extrabold tracking-[.14em] text-blue-600">
+            <p className="text-sm font-extrabold tracking-[.14em] text-blue-600"><PageText id="text_9">
               CHOOSE YOUR SERVICE
-            </p>
-            <h2 className="mt-3 max-w-xl text-4xl font-extrabold tracking-tight sm:text-5xl">
+            </PageText></p>
+            <h2 className="mt-3 max-w-xl text-4xl font-extrabold tracking-tight sm:text-5xl"><PageText id="text_10">
               Every journey deserves the right driver.
-            </h2>
+            </PageText></h2>
           </div>
           <Link
             to="/services"
             className="inline-flex items-center gap-2 font-extrabold text-blue-600"
-          >
-            Explore all services <ArrowRight size={18} />
+          ><PageText id="text_11">
+            Explore all services </PageText><ArrowRight size={18} />
           </Link>
         </motion.div>
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
@@ -244,8 +246,8 @@ function ServicesPreview({ services }) {
                 <Link
                   to={`/services/${service.slug}`}
                   className="mt-6 inline-flex items-center gap-2 font-extrabold text-blue-600"
-                >
-                  View details <ArrowRight size={17} />
+                ><PageText id="text_12">
+                  View details </PageText><ArrowRight size={17} />
                 </Link>
               </div>
             </motion.article>
@@ -278,21 +280,21 @@ function WhyChalakGo() {
     <section className="bg-white px-5 py-20 sm:py-28">
       <div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
         <motion.div {...reveal}>
-          <p className="text-sm font-extrabold tracking-[.14em] text-blue-600">
+          <p className="text-sm font-extrabold tracking-[.14em] text-blue-600"><PageText id="text_13">
             WHY CHALAKGO
-          </p>
-          <h2 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
+          </PageText></p>
+          <h2 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl"><PageText id="text_14">
             Comfort is better when trust comes first.
-          </h2>
-          <p className="mt-5 max-w-lg text-lg leading-8 text-slate-500">
+          </PageText></h2>
+          <p className="mt-5 max-w-lg text-lg leading-8 text-slate-500"><PageText id="text_15">
             We bring dependable drivers, transparent service and thoughtful
             support together in one simple booking experience.
-          </p>
+          </PageText></p>
           <Link
             to="/about"
             className="mt-7 inline-flex items-center gap-2 font-extrabold text-blue-600"
-          >
-            Meet ChalakGo <ArrowRight size={18} />
+          ><PageText id="text_16">
+            Meet ChalakGo </PageText><ArrowRight size={18} />
           </Link>
         </motion.div>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -306,8 +308,8 @@ function WhyChalakGo() {
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200">
                 <Icon size={22} />
               </span>
-              <h3 className="mt-6 text-lg font-extrabold">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-500">{text}</p>
+              <h3 className="mt-6 text-lg font-extrabold"><PageText id={`benefit${index+1}Title`}>{title}</PageText></h3>
+              <p className="mt-2 text-sm leading-6 text-slate-500"><PageText id={`benefit${index+1}Text`}>{text}</PageText></p>
             </motion.article>
           ))}
         </div>
@@ -333,20 +335,20 @@ function ContactPreview() {
         />
         <div className="relative">
           <p className="inline-flex items-center gap-2 text-sm font-extrabold tracking-[.13em] text-blue-200">
-            <CheckCircle2 size={17} /> HELP IS ALWAYS CLOSE
-          </p>
-          <h2 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
+            <CheckCircle2 size={17} /><PageText id="text_17"> HELP IS ALWAYS CLOSE
+          </PageText></p>
+          <h2 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl"><PageText id="text_18">
             Need help choosing a service?
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg leading-7 text-slate-300">
+          </PageText></h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-7 text-slate-300"><PageText id="text_19">
             Talk to our team for the right driver, timing and plan for your
             journey.
-          </p>
+          </PageText></p>
           <Link
             to="/contact"
             className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-4 font-extrabold text-blue-700 transition hover:-translate-y-0.5"
-          >
-            Talk to ChalakGo <ArrowRight size={18} />
+          ><PageText id="text_20">
+            Talk to ChalakGo </PageText><ArrowRight size={18} />
           </Link>
         </div>
       </motion.div>

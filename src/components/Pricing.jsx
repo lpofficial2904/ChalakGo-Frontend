@@ -1,3 +1,4 @@
+import { PageText } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { useEffect, useState } from "react";
 import { ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
@@ -73,7 +74,7 @@ export default function Pricing() {
     fetch(`${API_BASE}/api/services`)
       .then((response) => (response.ok ? response.json() : []))
       .then((items) => {
-        if (Array.isArray(items) && items.length) setServices(items);
+        if (Array.isArray(items)) setServices(items);
       })
       .catch(() => {});
   }, []);
@@ -92,15 +93,15 @@ export default function Pricing() {
           />
           <div className="relative">
             <p className="inline-flex items-center gap-2 rounded-full border border-blue-300/30 bg-white/10 px-4 py-2 text-xs font-bold tracking-[.14em] text-blue-100">
-              <Sparkles size={14} /> TRANSPARENT SERVICE CHARGES
-            </p>
-            <h1 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">
+              <Sparkles size={14} /><PageText id="text_1"> TRANSPARENT SERVICE CHARGES
+            </PageText></p>
+            <h1 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl"><PageText id="text_2">
               Simple prices.
-            </h1>
+            </PageText></h1>
             <div className="mx-auto mt-7 flex w-fit items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm text-blue-100">
-              <ShieldCheck size={17} className="text-cyan-300" /> Professional
+              <ShieldCheck size={17} className="text-cyan-300" /><PageText id="text_3"> Professional
               drivers · Clear rates · Trusted support
-            </div>
+            </PageText></div>
           </div>
         </div>
         <div className="relative z-10 mx-auto -mt-5 grid max-w-[1160px] gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -143,17 +144,17 @@ export default function Pricing() {
                     to={`/services/${service.slug}`}
                     className="mt-auto inline-flex items-center justify-between border-t border-slate-100 pt-6 text-sm font-extrabold text-blue-600 transition group-hover:text-blue-800"
                   >
-                    View details &amp; book <ArrowRight size={18} />
+                    <PageText id="cardButton">View details &amp; book</PageText> <ArrowRight size={18} />
                   </Link>
                 </div>
               </article>
             );
           })}
         </div>
-        <p className="mt-10 text-center text-sm leading-6 text-slate-500">
+        <p className="mt-10 text-center text-sm leading-6 text-slate-500"><PageText id="text_4">
           Taxes, tolls, parking and special requirements may be charged
           separately where applicable.
-        </p>
+        </PageText></p>
       </section>
     </main>
   );

@@ -1,3 +1,4 @@
+import { PageText } from "./PageCopy.jsx";
 import { motion } from "framer-motion";
 
 const vehicles = [
@@ -35,14 +36,14 @@ export default function Fleet() {
     <main className="min-h-screen bg-[#090f20] text-white">
       <section className="mx-auto max-w-[1280px] px-6 py-20 sm:py-28">
         <motion.div {...reveal} className="text-center">
-          <p className="text-sm font-bold text-blue-500">OUR VEHICLES</p>
-          <h1 className="mt-4 text-4xl font-extrabold sm:text-6xl">
+          <p className="text-sm font-bold text-blue-500"><PageText id="text_1">OUR VEHICLES</PageText></p>
+          <h1 className="mt-4 text-4xl font-extrabold sm:text-6xl"><PageText id="text_2">
             The Elite Fleet
-          </h1>
-          <p className="mx-auto mt-5 max-w-3xl text-lg leading-7 text-slate-400">
+          </PageText></h1>
+          <p className="mx-auto mt-5 max-w-3xl text-lg leading-7 text-slate-400"><PageText id="text_3">
             Flagship vehicles configured with priority comfort, pristine
             sanitization, and complimentary services.
-          </p>
+          </PageText></p>
         </motion.div>
         <div className="mt-16 grid gap-7 lg:grid-cols-3">
           {vehicles.map(([tag, name, seats, bags, image], i) => (
@@ -59,9 +60,9 @@ export default function Fleet() {
               />
               <div className="p-6">
                 <p className="text-xs font-bold uppercase text-blue-500">
-                  {tag}
+                  <PageText>{tag}</PageText>
                 </p>
-                <h2 className="mt-3 text-2xl font-extrabold">{name}</h2>
+                <h2 className="mt-3 text-2xl font-extrabold"><PageText>{name}</PageText></h2>
                 <p className="mt-4 text-sm text-slate-400">
                   ♙ {seats}&nbsp;&nbsp;&nbsp; ▣ {bags}
                 </p>

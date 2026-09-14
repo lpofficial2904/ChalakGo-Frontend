@@ -126,10 +126,6 @@ export default function Navbar() {
     document.body.classList.toggle("mobile-nav-open", open);
     return () => document.body.classList.remove("mobile-nav-open");
   }, [open]);
-  useEffect(() => {
-    const icon = document.querySelector("link[rel='icon']");
-    if (icon) icon.href = assetUrl(brand.mainFavicon) || "/favicon.svg";
-  }, [brand.mainFavicon]);
 
   const close = () => {
     setOpen(false);

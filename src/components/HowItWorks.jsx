@@ -1,3 +1,4 @@
+import { PageText } from "./PageCopy.jsx";
 import { motion } from "framer-motion";
 
 const steps = [
@@ -34,13 +35,13 @@ export default function HowItWorks() {
     <main className="min-h-screen bg-[#090f20] text-white">
       <section className="mx-auto max-w-[1280px] px-6 py-24 sm:py-32">
         <motion.div {...reveal} className="text-center">
-          <p className="text-sm font-bold text-blue-500">SIMPLIFIED FLOW</p>
-          <h1 className="mt-4 text-4xl font-extrabold sm:text-6xl">
+          <p className="text-sm font-bold text-blue-500"><PageText id="text_1">SIMPLIFIED FLOW</PageText></p>
+          <h1 className="mt-4 text-4xl font-extrabold sm:text-6xl"><PageText id="text_2">
             Your Chauffeur in Minutes
-          </h1>
-          <p className="mt-5 text-lg text-slate-400">
+          </PageText></h1>
+          <p className="mt-5 text-lg text-slate-400"><PageText id="text_3">
             Our streamlined technology makes elite service intuitive.
-          </p>
+          </PageText></p>
         </motion.div>
         <div className="mt-20 grid gap-10 md:grid-cols-4">
           {steps.map(([number, title, body], index) => (
@@ -51,11 +52,11 @@ export default function HowItWorks() {
               className="relative"
             >
               <div className="mb-7 text-5xl font-extrabold text-blue-500">
-                {number}
+                <PageText>{number}</PageText>
               </div>
               <div className="absolute left-32 right-2 top-6 hidden h-px bg-slate-700 md:block" />
-              <h2 className="text-xl font-extrabold">{title}</h2>
-              <p className="mt-3 leading-6 text-slate-400">{body}</p>
+              <h2 className="text-xl font-extrabold"><PageText>{title}</PageText></h2>
+              <p className="mt-3 leading-6 text-slate-400"><PageText>{body}</PageText></p>
             </motion.article>
           ))}
         </div>

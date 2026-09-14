@@ -1,3 +1,4 @@
+import { PageText } from "./PageCopy.jsx";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
@@ -28,8 +29,8 @@ export default function Faqs() {
             ["24 / 7", "PRIORITY SUPPORT"],
           ].map(([number, label]) => (
             <div key={label}>
-              <p className="text-3xl font-extrabold">{number}</p>
-              <p className="mt-1 text-xs text-blue-200">{label}</p>
+              <p className="text-3xl font-extrabold"><PageText>{number}</PageText></p>
+              <p className="mt-1 text-xs text-blue-200"><PageText>{label}</PageText></p>
             </div>
           ))}
         </div>
@@ -40,14 +41,14 @@ export default function Faqs() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <p className="text-sm font-bold text-blue-600">FAQ</p>
-          <h1 className="mt-4 text-4xl font-extrabold sm:text-5xl">
+          <p className="text-sm font-bold text-blue-600"><PageText id="text_1">FAQ</PageText></p>
+          <h1 className="mt-4 text-4xl font-extrabold sm:text-5xl"><PageText id="text_2">
             Frequently Asked Questions
-          </h1>
-          <p className="mt-5 text-lg text-slate-500">
+          </PageText></h1>
+          <p className="mt-5 text-lg text-slate-500"><PageText id="text_3">
             Everything you need to know about safety, payments, and driver
             service.
-          </p>
+          </PageText></p>
         </motion.div>
         <div className="mt-14 space-y-4">
           {faqs.map(([question, answer], i) => (
@@ -62,13 +63,13 @@ export default function Faqs() {
                 onClick={() => setOpen(open === i ? -1 : i)}
                 className="flex w-full items-center justify-between p-6 text-left font-extrabold"
               >
-                {question}
+                <PageText>{question}</PageText>
                 <span className="text-xl text-blue-600">
                   {open === i ? "−" : "+"}
                 </span>
               </button>
               {open === i && (
-                <p className="px-6 pb-6 leading-6 text-slate-500">{answer}</p>
+                <p className="px-6 pb-6 leading-6 text-slate-500"><PageText>{answer}</PageText></p>
               )}
             </motion.div>
           ))}

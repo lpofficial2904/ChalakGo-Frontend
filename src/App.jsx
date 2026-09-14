@@ -1,3 +1,4 @@
+import { PageCopyContext } from "./components/PageCopy.jsx";
 import { useLiveEffect } from "./components/LiveSite";
 import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
@@ -73,12 +74,13 @@ function EditablePage({ slug, Page, showFooterReviews = true }) {
       });
     return () => controller.abort();
   }, [slug]);
+  if (slug === "reviews" && (!page || page.statusOnly || page.preserveLayout)) return <PageCopyContext.Provider value={metadata?.copy || {}}><Page /></PageCopyContext.Provider>;
   if (slug === "terms-and-conditions")
     return <PublicPage showFooterReviews={false}><Terms page={metadata?.statusOnly ? null : metadata} /></PublicPage>;
-  if (!page || page.statusOnly)
+  if (!page || page.statusOnly || page.preserveLayout)
     return (
       <PublicPage showFooterReviews={showFooterReviews}>
-        <Page />
+        <PageCopyContext.Provider value={metadata?.copy || {}}><Page /></PageCopyContext.Provider>
       </PublicPage>
     );
   return (
@@ -116,9 +118,9 @@ export default function App() {
       {editableRoute("/terms-and-conditions", "terms-and-conditions", Terms, { showFooterReviews: false })}
       {publicRoute("/login", Login, { showFooterReviews: false })}
       {editableRoute("/pricing", "pricing", Pricing)}
-      {publicRoute("/services", Services)}
+      {editableRoute("/services", "services", Services)}
       {publicRoute("/services/:service", Services)}
-      {publicRoute("/blog", Blog)}
+      {editableRoute("/blog", "blog", Blog)}
       {publicRoute("/blog/:slug", Blog)}
       {publicRoute("/p/:slug", ManagedPage)}
 
@@ -126,7 +128,7 @@ export default function App() {
         showFooterReviews: false,
       })}
       {editableRoute("/fleet", "fleet", Fleet, { showFooterReviews: false })}
-      <Route path="/reviews" element={<Reviews />} />
+      {editableRoute("/reviews", "reviews", Reviews)}
       {editableRoute("/faqs", "faqs", Faqs, { showFooterReviews: false })}
       {publicRoute("*", () => <main className="px-5 py-24 text-center"><h1 className="text-4xl font-bold">Page not found</h1><a href="/">Return home</a></main>)}
     </Routes>

@@ -1,3 +1,4 @@
+import { PageText } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -49,17 +50,17 @@ export default function Reviews() {
             className="relative mx-auto max-w-3xl text-center"
           >
             <p className="inline-flex items-center gap-2 rounded-full border border-blue-300/25 bg-white/10 px-4 py-2 text-xs font-extrabold tracking-[.14em] text-blue-100">
-              <MessageCircle size={15} className="text-cyan-300" /> CUSTOMER
+              <MessageCircle size={15} className="text-cyan-300" /><PageText id="text_1"> CUSTOMER
               STORIES
-            </p>
+            </PageText></p>
             <h1 className="mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl">
               Trusted by people who{" "}
-              <span className="text-blue-300">value every journey.</span>
+              <span className="text-blue-300"><PageText id="text_2">value every journey.</PageText></span>
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300"><PageText id="text_3">
               Real experiences from customers who choose ChalakGo for
               dependable, professional driving support.
-            </p>
+            </PageText></p>
           </motion.div>
         </section>
         <section className="relative mx-auto max-w-[1180px] px-5 pb-20 sm:pb-28">
@@ -79,17 +80,17 @@ export default function Reviews() {
             ))}
           </div>
           {!message && !reviews.length && (
-            <p className="mt-14 rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+            <p className="mt-14 rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500"><PageText id="text_4">
               No reviews have been published yet.
-            </p>
+            </PageText></p>
           )}
           <motion.div
             {...reveal}
             className="mt-14 flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-slate-600"
           >
-            <ShieldCheck size={19} className="text-emerald-600" /> Reviews are
+            <ShieldCheck size={19} className="text-emerald-600" /><PageText id="text_5"> Reviews are
             managed and published by ChalakGo.
-          </motion.div>
+          </PageText></motion.div>
         </section>
       </main>
     </PageLayout>

@@ -1,3 +1,5 @@
+import { PageText } from "./PageCopy.jsx";
+import { contentOf } from "../../../shared/serviceContent.js";
 import { useLiveEffect } from "./LiveSite";
 import { usePageSeo } from "./Seo.jsx";
 import { assetUrl } from "../utils/assets.js";
@@ -191,16 +193,16 @@ function ServiceList({ services }) {
             className="absolute -bottom-24 -right-12 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl"
           />
           <div className="relative">
-            <p className="text-xs font-extrabold tracking-[.16em] text-blue-200">
+            <p className="text-xs font-extrabold tracking-[.16em] text-blue-200"><PageText id="text_1">
               CHALAKGO SERVICES
-            </p>
-            <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
+            </PageText></p>
+            <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl"><PageText id="text_2">
               The right driver for every journey.
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg leading-7 text-slate-300">
+            </PageText></h1>
+            <p className="mx-auto mt-4 max-w-2xl text-lg leading-7 text-slate-300"><PageText id="text_3">
               Flexible service options, professional standards and transparent
               pricing—designed around the way you travel.
-            </p>
+            </PageText></p>
           </div>
         </motion.div>
         <div className="mx-auto -mt-5 grid max-w-[1120px] gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -286,7 +288,7 @@ function ServiceDetails({ service }) {
               {service.detail}
             </p>
             <ul className="mt-7 space-y-3">
-              {service.features.map((item) => (
+              {(service.features || []).map((item) => (
                 <li key={item} className="text-sm text-slate-200">
                   ✓ {item}
                 </li>
@@ -300,6 +302,7 @@ function ServiceDetails({ service }) {
           </div>
         </div>
         {permanent && <PermanentInfo service={service} />}
+        <AdditionalContent service={service} />
         <BookingForm service={service} />
       </section>
     </main>
@@ -307,6 +310,7 @@ function ServiceDetails({ service }) {
 }
 
 function JaipurTour({ service }) {
+  const content = contentOf(service);
   const fallbackPlans = [
     {
       days: 1,
@@ -361,23 +365,20 @@ function JaipurTour({ service }) {
             <p className="relative text-xs font-extrabold tracking-[.2em] text-cyan-300">
               PRIVATE SIGHTSEEING · JAIPUR
             </p>
-            <h1 className="relative mt-3 text-4xl font-extrabold sm:text-5xl">Discover Jaipur in comfort.</h1>
+            <h1 className="relative mt-3 text-4xl font-extrabold sm:text-5xl">{service.name}</h1>
             <p className="relative mt-5 text-base leading-7 text-slate-300">
               Your private car, professional driver and a thoughtfully planned Pink City itinerary — all in one effortless day out.
             </p>
-            <div className="relative mt-8 grid grid-cols-3 gap-3 text-center text-xs font-bold text-blue-100">
-              <div className="rounded-2xl bg-white/10 px-2 py-3"><b className="block text-lg text-white">2</b> CURATED PLANS</div>
-              <div className="rounded-2xl bg-white/10 px-2 py-3"><b className="block text-lg text-white">8+</b> ICONIC STOPS</div>
-              <div className="rounded-2xl bg-white/10 px-2 py-3"><b className="block text-lg text-white">1:1</b> PRIVATE RIDE</div>
-            </div>
+            <ul className="relative mt-7 space-y-3">{(service.features || []).map(feature => <li key={feature}>{feature}</li>)}</ul>
+            <p className="relative mt-5 text-2xl font-bold">{service.price}</p>
           </div>
         </div>
         <div className="mt-10 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-extrabold tracking-[.16em] text-blue-600">CHOOSE YOUR EXPERIENCE</p>
-            <h2 className="mt-2 text-3xl font-extrabold">Pick the pace that suits you.</h2>
+            <p className="text-sm font-extrabold tracking-[.16em] text-blue-600">{content.plansEyebrow}</p>
+            <h2 className="mt-2 text-3xl font-extrabold">{content.plansTitle}</h2>
           </div>
-          <p className="max-w-sm text-sm leading-6 text-slate-500">Select a plan to view its hand-picked stops, then reserve your private tour in a few minutes.</p>
+          <p className="max-w-sm text-sm leading-6 text-slate-500">{content.plansDescription}</p>
         </div>
         <div className="mt-7 grid gap-6 md:grid-cols-2">
           {plans.map((plan, index) => (
@@ -457,12 +458,11 @@ function JaipurTour({ service }) {
               ))}
             </div>
             <p className="mt-7 text-sm leading-6 text-slate-600">
-              The itinerary can be customised. Contact our team before travel
-              for pickup time, route preferences, tolls, parking, and any
-              additional charges.
+              {content.itineraryNote}
             </p>
           </section>
         )}
+        <AdditionalContent service={service} />
         <TourBookingForm service={service} plan={active} />
       </section>
     </main>
@@ -701,62 +701,45 @@ function TourBookingForm({ service, plan }) {
 }
 
 function PermanentInfo({ service }) {
-  const monthlyRates = service.monthlyRates || {
+  const content = contentOf(service);
+  const monthlyRates = {
     sixToEight: 15000,
     eightToTen: 18000,
     tenToTwelve: 22000,
+    ...service.monthlyRates,
   };
   const plans = [
     [
       "6–8 Hours / Day",
-      "4 days/month",
+      content.monthlyLeave,
       `₹${monthlyRates.sixToEight.toLocaleString("en-IN")}/month`,
     ],
     [
       "8–10 Hours / Day",
-      "4 days/month",
+      content.monthlyLeave,
       `₹${monthlyRates.eightToTen.toLocaleString("en-IN")}/month`,
     ],
     [
       "10–12 Hours / Day",
-      "4 days/month",
+      content.monthlyLeave,
       `₹${monthlyRates.tenToTwelve.toLocaleString("en-IN")}/month`,
     ],
   ];
   return (
     <section className="mt-10 space-y-10">
       <div>
-        <p className="font-bold text-blue-600">PERMANENT DRIVER HIRE</p>
+        <p className="font-bold text-blue-600">{content.sectionEyebrow}</p>
         <h2 className="mt-2 text-3xl font-extrabold">
-          Hire a permanent driver for your daily routine.
+          {content.sectionTitle}
         </h2>
         <p className="mt-3 max-w-4xl leading-7 text-slate-600">
-          Get a reliable, professional driver for your home, office, or business
-          needs. Every driver is background-checked, trained, and matched to
-          your preferred schedule.
+          {content.sectionDescription}
         </p>
       </div>
       <div>
-        <h2 className="text-2xl font-extrabold">Why hire drivers from us?</h2>
+        <h2 className="text-2xl font-extrabold">{content.benefitsTitle}</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {[
-            [
-              "Experienced & verified",
-              "Background-checked and professionally trained drivers.",
-            ],
-            [
-              "Flexible timings",
-              "Choose daily shift times that match your requirement.",
-            ],
-            [
-              "Affordable pricing",
-              "Transparent monthly salary packages with no surprises.",
-            ],
-            [
-              "Trusted service",
-              "Dedicated support and dependable driver matching.",
-            ],
-          ].map(([title, body]) => (
+          {(content.benefits || '').split('\n').filter(Boolean).map(line => { const [title, ...body] = line.split('|'); return [title, body.join('|')]; }).map(([title, body]) => (
             <div
               key={title}
               className="rounded-xl border border-slate-200 bg-white p-5"
@@ -768,7 +751,7 @@ function PermanentInfo({ service }) {
         </div>
       </div>
       <div>
-        <h2 className="text-2xl font-extrabold">Permanent driver hire plans</h2>
+        <h2 className="text-2xl font-extrabold">{content.plansTitle}</h2>
         <div className="mt-4 grid gap-5 lg:grid-cols-3">
           {plans.map(([timing, leave, salary]) => (
             <article
@@ -788,15 +771,10 @@ function PermanentInfo({ service }) {
       </div>
       <div className="rounded-2xl border border-blue-100 bg-blue-50 p-6">
         <h2 className="text-2xl font-extrabold">
-          Other services for employers
+          {content.otherTitle}
         </h2>
         <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3 text-sm font-semibold text-slate-700">
-          {[
-            "Temporary Driver Services",
-            "Event Chauffeurs",
-            "Corporate & Office Drivers",
-            "Outstation & Travel Drivers",
-          ].map((item) => (
+          {(content.otherServices || '').split('\n').filter(Boolean).map((item) => (
             <span key={item}>• {item}</span>
           ))}
         </div>
@@ -1393,3 +1371,5 @@ function BookingForm({ service }) {
     </motion.form>
   );
 }
+
+function AdditionalContent({ service }) { return service.content ? <section className="mt-10 whitespace-pre-wrap rounded-2xl border border-slate-200 bg-white p-7 leading-7 text-slate-700">{service.content}</section> : null; }

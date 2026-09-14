@@ -143,7 +143,7 @@ export default function CabPricing({ service, dark = false }) {
             <FareRow
               key={plan.days}
               icon={CalendarDays}
-              title={`${plan.days}-day Jaipur Tour`}
+              title={plan.title || `${plan.days}-day Jaipur Tour`}
               subtitle={
                 plan.places?.length
                   ? `${plan.places.length} places included`
