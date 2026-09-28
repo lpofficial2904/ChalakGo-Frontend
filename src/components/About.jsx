@@ -1,3 +1,5 @@
+import SiteImage from "./SiteImage.jsx";
+import { siteFetch } from "../utils/siteFetch.js";
 import { PageText } from "./PageCopy.jsx";
 ﻿import {
   ArrowRight,
@@ -59,7 +61,7 @@ const values = [
 export default function About() {
   const [heroImage, setHeroImage] = useState(hero);
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/settings`)
+    siteFetch(`${API_BASE}/api/settings`)
       .then((response) => (response.ok ? response.json() : null))
       .then((settings) => {
         if (settings?.aboutHeroImage) setHeroImage(settings.aboutHeroImage);
@@ -120,7 +122,7 @@ export default function About() {
               <span><PageText id="text_7">ChalakGo</PageText></span>
               <span><PageText id="text_8">Jaipur, India</PageText></span>
             </div>
-            <img
+            <SiteImage priority
               src={assetUrl(heroImage)}
               alt="ChalakGo driving service"
               className="mt-5 aspect-[4/3] w-full rounded-2xl object-contain"

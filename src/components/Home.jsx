@@ -1,3 +1,5 @@
+import SiteImage from "./SiteImage.jsx";
+import { siteFetch } from "../utils/siteFetch.js";
 import { PageText, PageCopyContext } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { assetUrl } from "../utils/assets.js";
@@ -75,13 +77,13 @@ export default function Home() {
   const [services, setServices] = useState(fallbackServices);
   const [heroImage, setHeroImage] = useState(fallbackHero);
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/services`)
+    siteFetch(`${API_BASE}/api/services`)
       .then((response) => (response.ok ? response.json() : []))
       .then((items) => {
         if (Array.isArray(items)) setServices(items);
       })
       .catch(() => {});
-    fetch(`${API_BASE}/api/settings`)
+    siteFetch(`${API_BASE}/api/settings`)
       .then((response) => (response.ok ? response.json() : null))
       .then((settings) => {
         setHeroImage(assetUrl(settings?.heroImage) || fallbackHero);
@@ -146,7 +148,7 @@ export default function Home() {
           >
             <div className="absolute -inset-4 rounded-[34px] bg-blue-400/15 blur-2xl" />
             <div className="relative overflow-hidden rounded-[30px] border border-white/15 shadow-2xl shadow-black/30">
-              <img
+              <SiteImage priority
                 src={assetUrl(copy.heroImage || heroImage) || fallbackHero}
                 onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackHero; }}
                 alt="ChalakGo professional driver service"
@@ -228,8 +230,7 @@ function ServicesPreview({ services }) {
               className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(25,54,96,.08)] transition hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(25,54,96,.14)]"
             >
               <div className="relative overflow-hidden">
-                <img
-                  src={assetUrl(service.image)}
+                <SiteImage sizes="(max-width: 640px) 100vw, 33vw" src={assetUrl(service.image)}
                   alt={service.name}
                   className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
                 />

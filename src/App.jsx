@@ -1,23 +1,24 @@
+import { siteFetch } from "./utils/siteFetch.js";
 import { PageCopyContext } from "./components/PageCopy.jsx";
 import { useLiveEffect } from "./components/LiveSite";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import About from "./components/About";
-import Blog from "./components/Blog";
-import Contact from "./components/Contact";
-import Faqs from "./components/Faqs";
-import Fleet from "./components/Fleet";
+const About = lazy(() => import("./components/About.jsx"));
+const Blog = lazy(() => import("./components/Blog.jsx"));
+const Contact = lazy(() => import("./components/Contact.jsx"));
+const Faqs = lazy(() => import("./components/Faqs.jsx"));
+const Fleet = lazy(() => import("./components/Fleet.jsx"));
 import Home from "./components/Home";
-import HowItWorks from "./components/HowItWorks";
-import Login from "./components/Login";
-import ManagedPage from "./components/ManagedPage";
-import Pricing from "./components/Pricing";
-import Reviews from "./components/Reviews";
-import Services from "./components/Services";
+const HowItWorks = lazy(() => import("./components/HowItWorks.jsx"));
+const Login = lazy(() => import("./components/Login.jsx"));
+const ManagedPage = lazy(() => import("./components/ManagedPage.jsx"));
+const Pricing = lazy(() => import("./components/Pricing.jsx"));
+const Reviews = lazy(() => import("./components/Reviews.jsx"));
+const Services = lazy(() => import("./components/Services.jsx"));
 import SiteLayout from "./components/SiteLayout";
 import { API_BASE } from "./utils/api.js";
 import { usePageSeo } from "./components/Seo.jsx";
-import Terms from "./components/Terms.jsx";
+const Terms = lazy(() => import("./components/Terms.jsx"));
 
 // Every visitor page shares the same header, navigation, and footer.
 function PublicPage({ children, showFooterReviews = true }) {
@@ -58,7 +59,7 @@ function EditablePage({ slug, Page, showFooterReviews = true }) {
     const controller = new AbortController();
     // Built-in pages work without a published CMS override. Look up optional
     // content in the collection instead of requesting a missing page resource.
-    fetch(`${API_BASE}/api/pages`, { signal: controller.signal })
+    siteFetch(`${API_BASE}/api/pages`, { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
       .then((pages) => {
         if (!controller.signal.aborted) {
@@ -111,6 +112,7 @@ function EditablePage({ slug, Page, showFooterReviews = true }) {
 
 export default function App() {
   return (
+    <Suspense fallback={<main className="px-5 py-24 text-center text-slate-600" role="status">Loading page...</main>}>
     <Routes>
       {editableRoute("/", "home", Home)}
       {editableRoute("/about", "about", About)}
@@ -132,5 +134,6 @@ export default function App() {
       {editableRoute("/faqs", "faqs", Faqs, { showFooterReviews: false })}
       {publicRoute("*", () => <main className="px-5 py-24 text-center"><h1 className="text-4xl font-bold">Page not found</h1><a href="/">Return home</a></main>)}
     </Routes>
+    </Suspense>
   );
 }

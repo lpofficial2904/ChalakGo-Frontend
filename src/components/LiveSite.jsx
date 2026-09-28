@@ -1,16 +1,23 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { siteFetch, clearSiteCache } from "../utils/siteFetch.js";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { API_BASE } from "../utils/api.js";
 import { UnavailableSeo } from "./Seo.jsx";
 const Context = createContext({ revision: "", statuses: [] });
 export function LiveSite({ children }) {
+  const receivedRevision = useRef(null);
   const [revision, setRevision] = useState("");
   const [statuses, setStatuses] = useState([]);
   useEffect(() => {
     const events = new EventSource(`${API_BASE}/api/events`);
     events.onmessage = (event) => {
       try {
-        setRevision(JSON.parse(event.data).revision);
+        const next = JSON.parse(event.data).revision;
+        if (receivedRevision.current !== null && next !== receivedRevision.current) {
+          clearSiteCache();
+          setRevision(next);
+        }
+        receivedRevision.current = next;
       } catch {
         /* Ignore malformed events. */
       }
@@ -19,7 +26,7 @@ export function LiveSite({ children }) {
   }, []);
   useEffect(() => {
     const controller = new AbortController();
-    fetch(`${API_BASE}/api/page-status`, {
+    siteFetch(`${API_BASE}/api/page-status`, {
       signal: controller.signal,
       cache: "no-store",
     })

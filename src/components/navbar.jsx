@@ -1,8 +1,10 @@
+import SiteImage from "./SiteImage.jsx";
+import { siteFetch } from "../utils/siteFetch.js";
 import { useLiveEffect } from "./LiveSite";
 import { assetUrl } from "../utils/assets.js";
 import { useEffect, useState } from "react";
 import { SiteLink as Link, SiteNavLink as NavLink } from "./LiveSite";
-import defaultLogo from "../assets/Chalakgo logo.png";
+import defaultLogo from "../assets/chalakgo-logo.webp";
 import { ChevronDown, LogOut, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { API_BASE } from "../utils/api.js";
@@ -62,7 +64,7 @@ export default function Navbar() {
 
   // Published admin services are the source of truth for this menu.
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/services`)
+    siteFetch(`${API_BASE}/api/services`)
       .then((r) => (r.ok ? r.json() : null))
       .then((items) => {
         if (Array.isArray(items)) setServices(items);
@@ -70,7 +72,7 @@ export default function Navbar() {
       .catch(() => {});
   }, []);
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/pages`)
+    siteFetch(`${API_BASE}/api/pages`)
       .then((r) => (r.ok ? r.json() : null))
       .then((items) => {
         if (Array.isArray(items)) setPages(items);
@@ -78,7 +80,7 @@ export default function Navbar() {
       .catch(() => {});
   }, []);
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/settings`, { credentials: "include" })
+    siteFetch(`${API_BASE}/api/settings`)
       .then((r) => (r.ok ? r.json() : null))
       .then((x) => x && setBrand((v) => ({ ...v, ...x })))
       .catch(() => {});
@@ -160,7 +162,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white text-[#10213f] shadow-sm">
       <nav className="mx-auto flex h-[72px] max-w-[1380px] items-center justify-between px-4 lg:px-12">
         <Link to="/" onClick={close} className="flex items-center">
-          <img
+          <SiteImage priority sizes="160px"
             src={assetUrl(brand.navbarLogo) || assetUrl(brand.logo) || defaultLogo}
             onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = defaultLogo; }}
             alt={brand.siteName}

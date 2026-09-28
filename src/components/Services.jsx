@@ -1,3 +1,9 @@
+import SiteImage from "./SiteImage.jsx";
+import ServiceFareEstimate from "./ServiceFareEstimate.jsx";
+import DriverFareEstimate from "./DriverFareEstimate.jsx";
+import { siteFetch } from "../utils/siteFetch.js";
+import DriverPlans from "./DriverPlans.jsx";
+import { driverPricing } from "../../../shared/driverPricing.js";
 import { PageText } from "./PageCopy.jsx";
 import { contentOf } from "../../../shared/serviceContent.js";
 import { useLiveEffect } from "./LiveSite";
@@ -22,7 +28,9 @@ import {
   pickupPayload as buildPickupPayload,
 } from "../utils/location.js";
 import {
+  calculateDriverOnlyFare,
   calculateDistanceFare,
+  calculateFixedFare,
   calculateMonthlyFare,
   calculateTemporaryDriverFare,
 } from "../utils/fare.js";
@@ -159,7 +167,7 @@ export default function Services() {
   const [services, setServices] = useState([...defaultServices, jaipurTour]);
   // Published services saved from Admin render here automatically.
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/services`)
+    siteFetch(`${API_BASE}/api/services`)
       .then((r) => (r.ok ? r.json() : null))
       .then((items) => {
         if (Array.isArray(items)) setServices(items);
@@ -217,7 +225,7 @@ function ServiceList({ services }) {
               className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_14px_40px_rgba(25,54,96,.10)]"
             >
               <div className="relative">
-                <img
+                <SiteImage
                   src={assetUrl(item.image)}
                   alt={item.name}
                   className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
@@ -273,7 +281,7 @@ function ServiceDetails({ service }) {
           ← All services
         </Link>
         <div className="relative mt-6 overflow-hidden rounded-[32px] bg-[#071a36] text-white shadow-2xl lg:grid lg:grid-cols-[1.08fr_.92fr]">
-          <img
+          <SiteImage priority
             src={assetUrl(service.image)}
             alt={service.name}
             onError={(event) => {
@@ -297,7 +305,7 @@ function ServiceDetails({ service }) {
             {service.slug === "car-driver" ? (
               <CabPricing service={service} dark />
             ) : (
-              <p className="mt-8 text-3xl font-extrabold">{service.price}</p>
+              <p className="mt-8 text-3xl font-extrabold">{service.slug === "driver-only" ? `Plans from ₹${Math.min(...driverPricing(service.driverPricing).plans.map(plan => plan.price)).toLocaleString("en-IN")}` : service.price}</p>
             )}
           </div>
         </div>
@@ -352,7 +360,7 @@ function JaipurTour({ service }) {
           ← All services
         </Link>
         <div className="mt-6 overflow-hidden rounded-3xl bg-[#0b1c38] text-white shadow-xl lg:grid lg:grid-cols-2">
-          <img
+          <SiteImage priority
             src={assetUrl(service.image)}
             alt="Jaipur sightseeing"
             onError={(event) => {
@@ -389,7 +397,7 @@ function JaipurTour({ service }) {
               className={`group relative overflow-hidden rounded-3xl border bg-white p-7 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${selected === index ? "border-blue-600 ring-4 ring-blue-100" : "border-slate-200 hover:border-blue-400"}`}
             >
               {plan.image && (
-                <img
+                <SiteImage
                   src={assetUrl(plan.image)}
                   alt={plan.title || `${plan.days}-day Jaipur Tour`}
                   className="mb-6 h-40 w-full rounded-2xl object-cover"
@@ -434,7 +442,7 @@ function JaipurTour({ service }) {
               </button>
             </div>
             {active.image && (
-              <img
+              <SiteImage
                 src={assetUrl(active.image)}
                 alt={active.title || `${active.days}-day Jaipur Tour`}
                 className="mt-7 h-64 w-full rounded-2xl object-cover"
@@ -470,6 +478,12 @@ function JaipurTour({ service }) {
 }
 
 function TourBookingForm({ service, plan }) {
+  let tourFare = null;
+  let tourFareError = "";
+  if (plan) {
+    try { tourFare = calculateFixedFare({ tourPlanPrice: plan.price }); }
+    catch (error) { tourFareError = error.message; }
+  }
   const { hash } = useLocation();
   useEffect(() => {
     if (hash !== "#booking") return;
@@ -527,6 +541,7 @@ function TourBookingForm({ service, plan }) {
   const submit = async (event) => {
     event.preventDefault();
     if (!plan) return setStatus("Select a 1-day or 2-day tour plan first.");
+    if (!tourFare) return setStatus(tourFareError);
     if (loading)
       return setStatus("Please wait for location detection to finish.");
     if (!/^[6-9][0-9]{9}$/.test(form.phone))
@@ -568,7 +583,7 @@ function TourBookingForm({ service, plan }) {
           carType: "Tour vehicle",
           duration: `${plan.days} day tour`,
           tourPlanDays: plan.days,
-          totalFare: Number(String(plan.price).replace(/[^0-9.]/g, "")),
+          totalFare: tourFare.totalFare,
           ...pickupPayload(form, locationMode, coordinates, timestamp),
         }),
       });
@@ -658,6 +673,7 @@ function TourBookingForm({ service, plan }) {
             </label>
           ))}
       </div>
+      <div className="mt-5"><ServiceFareEstimate kind="fixed" selected={plan.title || `${plan.days}-day Jaipur Tour`} days={plan.days} fare={tourFare} error={tourFareError} /></div>
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <button
           type="button"
@@ -819,7 +835,9 @@ function BookingForm({ service }) {
         "Haravan Traveller",
       ]
     : ["Sedan / SUV", "Hatchback"];
-  const temporary =
+  const driverOnly = service.slug === "driver-only" || service.name === "Driver Only";
+  const pricing = driverPricing(service.driverPricing);
+  const temporary = driverOnly ||
     !permanent &&
     !distanceBased &&
     !monthlyBased &&
@@ -846,6 +864,8 @@ function BookingForm({ service }) {
     mainRoad: "",
     carType: distanceBased ? "SUV (5 seater)" : "Sedan / SUV",
     distanceKm: "",
+    driverPackage: "4",
+    nightCharge: false,
     duration: permanent ? "6–8 Hours / Day" : "8 Hours",
     startDate: "",
     endDate: "",
@@ -907,7 +927,7 @@ function BookingForm({ service }) {
     }
   } else if (temporary) {
     try {
-      fare = calculateTemporaryDriverFare({ ...form, price: service.price });
+      fare = driverOnly ? calculateDriverOnlyFare({ ...form, driverPricing: pricing, nightCharge: false }) : calculateTemporaryDriverFare({ ...form, price: service.price });
     } catch (error) {
       fareError = error.message;
     }
@@ -1101,57 +1121,12 @@ function BookingForm({ service }) {
         required: true,
       })
     : null;
-  const distanceEstimate = distanceBased && (
-    <section
-      aria-live="polite"
-      className="rounded-xl border border-blue-100 bg-blue-50 p-4 sm:col-span-2"
-    >
-      <h3 className="font-bold">Fare Estimate</h3>
-      {fare ? (
-        <div className="mt-3 space-y-2 text-sm">
-          <p>
-            {form.carType} · Trip distance: {fare.distanceKm} km
-          </p>
-          {fare.baseFare > 0 && (
-            <p>
-              Flat charge (up to {fare.includedKm} km): ₹
-              {fare.baseFare.toLocaleString("en-IN")}
-            </p>
-          )}
-          <p>
-            {fare.baseFare > 0
-              ? `Extra distance after ${fare.includedKm} km`
-              : "Distance charge"}
-            : {fare.additionalKm} km × ₹{fare.ratePerKm}/km = ₹
-            {fare.additionalFare.toFixed(2)}
-          </p>
-          <p className="font-bold">
-            TOTAL ESTIMATE = ₹{fare.totalFare.toFixed(2)}
-          </p>
-        </div>
-      ) : (
-        <p className="mt-2 text-sm">
-          {fareError || "Enter trip distance to see the estimate."}
-        </p>
-      )}
-    </section>
-  );
-  const monthlyEstimate = monthlyBased && (
-    <section
-      aria-live="polite"
-      className="rounded-xl border border-blue-100 bg-blue-50 p-4 sm:col-span-2"
-    >
-      <h3 className="font-bold">Monthly Estimate</h3>
-      {fare ? (
-        <p className="mt-2 text-sm">
-          <b>{form.duration}</b> at{" "}
-          <b>₹{fare.monthlyRate.toLocaleString("en-IN")}/month</b>
-        </p>
-      ) : (
-        <p className="mt-2 text-sm">{fareError}</p>
-      )}
-    </section>
-  );
+  let distancePreview = null;
+  if (distanceBased && !form.distanceKm) {
+    try { distancePreview = calculateDistanceFare({ carType: form.carType, distanceKm: 1, vehicleRates: service.vehicleRates }); } catch { /* A valid vehicle is required. */ }
+  }
+  const distanceEstimate = distanceBased && <ServiceFareEstimate kind="distance" selected={form.carType} fare={fare} preview={distancePreview} error={form.distanceKm ? fareError : ""} />;
+  const monthlyEstimate = monthlyBased && <ServiceFareEstimate kind="monthly" selected={form.duration} duration={form.duration} fare={fare} error={fareError} />;
   const schedules = (
     <>
       {field("Start date & time", "startDateTime", "datetime-local", {
@@ -1166,41 +1141,12 @@ function BookingForm({ service }) {
       {monthlyEstimate}
     </>
   );
-  const temporaryEstimate = temporary && (
-    <section
-      aria-live="polite"
-      className="rounded-xl border border-amber-200 bg-amber-50 p-5 sm:col-span-2"
-    >
-      <h3 className="font-bold">Temporary Driver Fare Estimate</h3>
-      {fare ? (
-        <div className="mt-3 space-y-2 text-sm text-slate-700">
-          <p>Trip duration: {fare.duration}</p>
-          <p>
-            Base {fare.baseHours} hours flat charge: ₹{fare.baseFare.toFixed(2)}
-          </p>
-          {fare.additionalHours > 0 && (
-            <p>
-              Additional {fare.additionalHours.toFixed(2)} hours × ₹
-              {fare.additionalHourlyRate}/hour = ₹
-              {fare.additionalFare.toFixed(2)}
-            </p>
-          )}
-          <div className="mt-3 border-t border-amber-200 pt-3">
-            <p>Subtotal: ₹{fare.subtotal.toFixed(2)}</p>
-            <p className="text-emerald-700">
-              Promotional discount: −₹{fare.discount.toFixed(2)}
-            </p>
-            <p className="mt-2 text-base font-extrabold text-[#10213f]">
-              TOTAL ESTIMATE = ₹{fare.totalFare.toFixed(2)}
-            </p>
-          </div>
-        </div>
-      ) : (
-        <p className="mt-2 text-sm">{fareError}</p>
-      )}
-    </section>
-  );
+  const temporaryEstimate = driverOnly ? (
+    <DriverFareEstimate pricing={pricing} selected={form.driverPackage} fare={fare} error={fareError} hasSchedule={Boolean(form.startDateTime || form.endDateTime)} />
+  ) : temporary && <ServiceFareEstimate kind="hourly" selected={service.name} fare={fare} error={fareError} />;
   return (
+    <>
+    {driverOnly && <DriverPlans pricing={pricing} selected={form.driverPackage} onSelect={(driverPackage) => setForm((old) => ({ ...old, driverPackage }))} />}
     <motion.form
       id="booking"
       initial={{ opacity: 0, y: 25 }}
@@ -1254,7 +1200,7 @@ function BookingForm({ service }) {
               <option>10–12 Hours / Day</option>
             </select>
           </label>
-        ) : temporary ? (
+        ) : temporary ? (driverOnly ? null :
           <div className="text-sm font-bold">
             Duration
             <p className="mt-2">
@@ -1278,6 +1224,7 @@ function BookingForm({ service }) {
             </select>
           </label>
         )}
+        {driverOnly && <DriverPlans compact pricing={pricing} selected={form.driverPackage} onSelect={(driverPackage) => setForm((old) => ({ ...old, driverPackage }))} />}
         {schedules}
         {temporaryEstimate}
         <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 sm:col-span-2">
@@ -1369,6 +1316,7 @@ function BookingForm({ service }) {
         <p className="mt-4 text-center font-medium text-blue-700">{status}</p>
       )}
     </motion.form>
+    </>
   );
 }
 

@@ -1,3 +1,4 @@
+import { siteFetch } from "../utils/siteFetch.js";
 import { PageText } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { useEffect, useState } from "react";
@@ -35,7 +36,7 @@ export default function Contact() {
   });
   const [sending, setSending] = useState(false);
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/settings`)
+    siteFetch(`${API_BASE}/api/settings`)
       .then((r) => (r.ok ? r.json() : null))
       .then(
         (x) => x && setSettings((value) => ({ ...fallback, ...value, ...x })),

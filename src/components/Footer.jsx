@@ -1,3 +1,5 @@
+import SiteImage from "./SiteImage.jsx";
+import { siteFetch } from "../utils/siteFetch.js";
 import { useLiveEffect } from "./LiveSite";
 import { assetUrl } from "../utils/assets.js";
 import { useEffect, useState } from "react";
@@ -36,7 +38,7 @@ export default function Footer() {
   const [settings, setSettings] = useState(defaults);
   const [services, setServices] = useState(fallbackServices);
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/settings`)
+    siteFetch(`${API_BASE}/api/settings`)
       .then((response) => (response.ok ? response.json() : null))
       .then(
         (data) =>
@@ -45,7 +47,7 @@ export default function Footer() {
       .catch(() => {});
   }, []);
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/services`)
+    siteFetch(`${API_BASE}/api/services`)
       .then((response) => (response.ok ? response.json() : null))
       .then((items) => {
         if (Array.isArray(items)) setServices(items);
@@ -72,7 +74,7 @@ export default function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           <div>
             {settings.footerLogo || settings.logo ? (
-              <img
+              <SiteImage sizes="160px"
                 src={assetUrl(settings.footerLogo || settings.logo)}
                 alt={settings.siteName}
                 className="h-12 max-w-xs object-contain object-left"

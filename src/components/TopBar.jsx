@@ -1,3 +1,4 @@
+import { siteFetch } from "../utils/siteFetch.js";
 import { useLiveEffect } from "./LiveSite";
 import { MapPin, Phone, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -17,7 +18,7 @@ export default function TopBar() {
   });
 
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/settings`)
+    siteFetch(`${API_BASE}/api/settings`)
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => data && setSettings((value) => ({ ...value, ...data })))
       .catch(() => {});

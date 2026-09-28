@@ -1,3 +1,5 @@
+import { siteFetch } from "../utils/siteFetch.js";
+import SiteImage from "./SiteImage.jsx";
 import { PageText } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { useEffect, useState } from "react";
@@ -17,7 +19,7 @@ export default function Reviews() {
   const [message, setMessage] = useState("");
 
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/reviews`)
+    siteFetch(`${API_BASE}/api/reviews`)
       .then((response) => (response.ok ? response.json() : Promise.reject()))
       .then((items) =>
         setReviews([
@@ -134,7 +136,7 @@ function ReviewCard({ review, index }) {
       <div className="relative mt-7 flex items-center gap-3 border-t border-slate-100 pt-5">
         <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 font-extrabold text-white">
           {review.avatar ? (
-            <img
+            <SiteImage
               src={review.avatar}
               alt={review.customerName}
               className="h-full w-full object-cover"

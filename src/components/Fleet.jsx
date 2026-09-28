@@ -1,3 +1,4 @@
+import SiteImage from "./SiteImage.jsx";
 import { PageText } from "./PageCopy.jsx";
 import { motion } from "framer-motion";
 
@@ -53,7 +54,7 @@ export default function Fleet() {
               key={name}
               className="overflow-hidden rounded-2xl border border-slate-700 bg-[#131d31]"
             >
-              <img
+              <SiteImage
                 src={image}
                 alt={name}
                 className="h-64 w-full object-cover"

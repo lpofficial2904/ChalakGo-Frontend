@@ -1,5 +1,6 @@
 import { CalendarDays, CarFront, Clock3, UsersRound } from "lucide-react";
 import { calculateDistanceFare } from "../utils/fare.js";
+import { driverPricing } from "../../../shared/driverPricing.js";
 
 const money = (value) =>
   new Intl.NumberFormat("en-IN", {
@@ -44,6 +45,8 @@ function FareRow({ icon: Icon = Clock3, title, subtitle, amount, note, dark }) {
 }
 
 export default function CabPricing({ service, dark = false }) {
+  const driverOnly = service.slug === "driver-only";
+  const pricing = driverOnly ? driverPricing(service.driverPricing) : null;
   const panel = dark
     ? "border-white/15 bg-white/5"
     : "border-blue-100 bg-blue-50/50";
@@ -88,6 +91,7 @@ export default function CabPricing({ service, dark = false }) {
         </h3>
       </div>
       <div className={`divide-y ${divider}`}>
+        {driverOnly && pricing.plans.map(plan => <FareRow key={plan.id} title={plan.label} subtitle={plan.description} amount={money(plan.price)} note={plan.id === "outstation" ? `${money(plan.price)}/day + food/stay` : `${money(pricing.additionalHourlyRate)}/extra hour`} dark={dark} />)}
         {distanceBased &&
           vehicles.map(([name, seats, carType]) => {
             const fare = calculateDistanceFare({
@@ -153,7 +157,7 @@ export default function CabPricing({ service, dark = false }) {
               dark={dark}
             />
           ))}
-        {!distanceBased && !monthlyBased && !tourBased && (
+        {!driverOnly && !distanceBased && !monthlyBased && !tourBased && (
           <FareRow
             title={service.price || "Contact us for pricing"}
             amount=""

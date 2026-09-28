@@ -1,3 +1,4 @@
+import { siteFetch } from "../utils/siteFetch.js";
 import { PageText } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { useEffect, useState } from "react";
@@ -71,7 +72,7 @@ const fallbackServices = [
 export default function Pricing() {
   const [services, setServices] = useState(fallbackServices);
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/services`)
+    siteFetch(`${API_BASE}/api/services`)
       .then((response) => (response.ok ? response.json() : []))
       .then((items) => {
         if (Array.isArray(items)) setServices(items);

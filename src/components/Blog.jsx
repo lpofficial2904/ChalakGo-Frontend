@@ -1,3 +1,5 @@
+import { siteFetch } from "../utils/siteFetch.js";
+import SiteImage from "./SiteImage.jsx";
 import { PageText } from "./PageCopy.jsx";
 import { useLiveEffect } from './LiveSite'
 import { usePageSeo } from './Seo.jsx'
@@ -19,7 +21,7 @@ function formatDate(value) {
 }
 
 async function fetchJson(path, signal) {
-  const response = await fetch(`${API_BASE}${path}`, { signal })
+  const response = await siteFetch(`${API_BASE}${path}`, { signal })
   const data = await response.json()
   if (!response.ok) throw new Error(data.message || 'Unable to load blog posts.')
   return data
@@ -88,7 +90,7 @@ function BlogList({ posts }) {
 function BlogCard({ post }) {
   return (
     <article className="overflow-hidden rounded-3xl border bg-white shadow-sm">
-      <img src={assetUrl(post.coverImage || fallbackImage)} alt={post.coverAlt || post.title} className="h-48 w-full object-cover" />
+      <SiteImage src={assetUrl(post.coverImage || fallbackImage)} alt={post.coverAlt || post.title} className="h-48 w-full object-cover" />
       <div className="p-7">
         <p className="text-sm font-semibold text-blue-600">
           {formatDate(post.publishedAt)} · {post.author || 'ChalakGo Team'}
@@ -117,7 +119,7 @@ function BlogPost({ post }) {
         {post.category && <p className="mt-4 font-semibold text-blue-600">{post.category}</p>}
         {post.excerpt && <p className="mt-6 text-xl leading-8 text-slate-500">{post.excerpt}</p>}
         {post.coverImage && (
-          <img
+          <SiteImage priority
             src={assetUrl(post.coverImage)}
             alt={post.coverAlt || post.title}
             className="mt-10 h-72 w-full rounded-3xl object-cover sm:h-[440px]"

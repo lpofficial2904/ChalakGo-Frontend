@@ -1,3 +1,5 @@
+import { siteFetch } from "../utils/siteFetch.js";
+import SiteImage from "./SiteImage.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -10,7 +12,7 @@ export default function FooterReviews() {
   const [slide, setSlide] = useState(0);
 
   useLiveEffect(() => {
-    fetch(`${API_BASE}/api/reviews`)
+    siteFetch(`${API_BASE}/api/reviews`)
       .then((response) => (response.ok ? response.json() : []))
       .then(setReviews)
       .catch(() => setReviews([]));
@@ -99,7 +101,7 @@ export default function FooterReviews() {
                   <div className="relative mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-sm font-extrabold leading-none text-white shadow-md shadow-blue-200">
                       {review.avatar ? (
-                        <img
+                        <SiteImage
                           src={review.avatar}
                           alt={review.customerName}
                           className="h-full w-full object-cover"

@@ -54,6 +54,8 @@ export function calculateTemporaryDriverFare({ startDateTime, endDateTime }) {
   };
 }
 
+export { calculateDriverOnlyFare } from "../../../shared/driverPricing.js";
+
 export function calculateDistanceFare({ distanceKm, carType, vehicleRates }) {
   const distance = Number(distanceKm);
   const type = String(carType);
@@ -102,4 +104,11 @@ export function calculateMonthlyFare({ duration, monthlyRates }) {
   if (!key || !Number.isFinite(monthlyRate) || monthlyRate <= 0)
     throw new Error("Select a valid permanent driver shift.");
   return { monthlyRate, totalFare: monthlyRate };
+}
+
+export function calculateFixedFare({ tourPlanPrice }) {
+  const amount = Number(String(tourPlanPrice || "").replace(/[^0-9.]/g, ""));
+  if (!Number.isFinite(amount) || amount <= 0)
+    throw new Error("This tour plan does not have a valid price.");
+  return { totalFare: amount };
 }
