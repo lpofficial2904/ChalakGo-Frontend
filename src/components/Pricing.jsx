@@ -6,6 +6,7 @@ import { ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { API_BASE } from "../utils/api.js";
 import CabPricing from "./CabPricing";
+import "./Pricing.css";
 
 const fallbackServices = [
   {
@@ -81,7 +82,7 @@ export default function Pricing() {
   }, []);
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f6f9ff] px-5 py-10 text-[#10213f] sm:py-16">
+    <main className="pricing-page min-h-screen bg-[#f6f9ff] px-5 py-10 text-[#10213f] sm:py-16">
       <section className="mx-auto max-w-6xl">
         <div className="relative overflow-hidden rounded-[32px] bg-[#091b38] px-7 py-12 text-center text-white shadow-2xl shadow-blue-950/15 sm:px-14 sm:py-16">
           <div
@@ -105,7 +106,7 @@ export default function Pricing() {
             </PageText></div>
           </div>
         </div>
-        <div className="relative z-10 mx-auto -mt-5 grid max-w-[1160px] gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-8 grid gap-6">
           {services.map((service, index) => {
             const accent =
               index % 3 === 0
@@ -116,12 +117,13 @@ export default function Pricing() {
             return (
               <article
                 key={service.slug}
-                className="group flex min-h-[390px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_14px_40px_rgba(30,55,95,.10)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(30,55,95,.16)]"
+                className="pricing-service group min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_8px_30px_rgba(30,55,95,.06)]"
               >
                 <div className={`h-2 bg-gradient-to-r ${accent}`} />
-                <div className="flex flex-1 flex-col p-7">
+                <div className="pricing-service-body">
+                  <div className="min-w-0">
                   <div className="flex items-start justify-between gap-4">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-[11px] font-extrabold tracking-[.11em] text-blue-600">
                         {service.eyebrow || "CHALAKGO SERVICE"}
                       </p>
@@ -136,17 +138,18 @@ export default function Pricing() {
                     </span>
                   </div>
                   {service.detail && (
-                    <p className="mt-4 min-h-12 text-sm leading-6 text-slate-500">
+                    <p className="mt-4 text-sm leading-6 text-slate-500">
                       {service.detail}
                     </p>
                   )}
-                  <CabPricing service={service} />
                   <Link
                     to={`/services/${service.slug}`}
-                    className="mt-auto inline-flex items-center justify-between border-t border-slate-100 pt-6 text-sm font-extrabold text-blue-600 transition group-hover:text-blue-800"
+                    className="mt-6 inline-flex max-w-full items-center justify-between gap-4 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600"
                   >
                     <PageText id="cardButton">View details &amp; book</PageText> <ArrowRight size={18} />
                   </Link>
+                  </div>
+                  <CabPricing service={service} />
                 </div>
               </article>
             );

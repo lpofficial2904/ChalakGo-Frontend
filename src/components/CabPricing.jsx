@@ -1,6 +1,6 @@
 import { CalendarDays, CarFront, Clock3, UsersRound } from "lucide-react";
 import { calculateDistanceFare } from "../utils/fare.js";
-import { driverPricing } from "../../../shared/driverPricing.js";
+import { driverPricing } from "../shared/driverPricing.js";
 
 const money = (value) =>
   new Intl.NumberFormat("en-IN", {
@@ -11,8 +11,8 @@ const money = (value) =>
 
 function FareRow({ icon: Icon = Clock3, title, subtitle, amount, note, dark }) {
   return (
-    <div className="px-4 py-3.5">
-      <div className="flex items-start justify-between gap-3">
+    <div className="fare-row px-4 py-3.5">
+      <div className="fare-row-heading flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p
             className={`flex items-center gap-1.5 text-sm font-bold ${dark ? "text-white" : "text-[#10213f]"}`}
@@ -28,7 +28,7 @@ function FareRow({ icon: Icon = Clock3, title, subtitle, amount, note, dark }) {
           )}
         </div>
         <p
-          className={`shrink-0 text-right text-lg font-extrabold tabular-nums ${dark ? "text-cyan-200" : "text-blue-700"}`}
+          className={`max-w-full break-words text-lg font-extrabold tabular-nums ${dark ? "text-cyan-200" : "text-blue-700"}`}
         >
           {amount}
         </p>
@@ -80,7 +80,7 @@ export default function CabPricing({ service, dark = false }) {
   return (
     <section
       aria-label={`${service.name} pricing`}
-      className={`mt-7 overflow-hidden rounded-2xl border ${panel}`}
+      className={`fare-panel mt-7 min-w-0 overflow-hidden rounded-2xl border ${panel}`}
     >
       <div
         className={`flex items-center gap-2 border-b px-4 py-3 ${divider} ${dark ? "text-blue-200" : "text-blue-700"}`}
@@ -90,7 +90,7 @@ export default function CabPricing({ service, dark = false }) {
           {heading}
         </h3>
       </div>
-      <div className={`divide-y ${divider}`}>
+      <div className={`fare-options divide-y ${divider}`}>
         {driverOnly && pricing.plans.map(plan => <FareRow key={plan.id} title={plan.label} subtitle={plan.description} amount={money(plan.price)} note={plan.id === "outstation" ? `${money(plan.price)}/day + food/stay` : `${money(pricing.additionalHourlyRate)}/extra hour`} dark={dark} />)}
         {distanceBased &&
           vehicles.map(([name, seats, carType]) => {

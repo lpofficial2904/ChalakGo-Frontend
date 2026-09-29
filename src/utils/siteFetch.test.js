@@ -2,6 +2,37 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { siteFetch, clearSiteCache } from "./siteFetch.js";
 
+test("fresh public content survives reload, expires, and clears after an admin update", async (t) => {
+  const data = new Map();
+  const original = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage");
+  Object.defineProperty(globalThis, "sessionStorage", { configurable: true, value: {
+    getItem: key => data.get(key) || null,
+    setItem: (key, value) => data.set(key, value),
+    removeItem: key => data.delete(key),
+    key: index => [...data.keys()][index],
+    get length() { return data.size; },
+  } });
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, "sessionStorage", original);
+    else delete globalThis.sessionStorage;
+  });
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async () => { calls++; return Response.json({ price: 599 }); });
+  const key = 'chalakgo-public-v1:/api/services|same-origin';
+  data.set(key, JSON.stringify({ body: JSON.stringify({ price: 499 }), expires: Date.now() + 30000 }));
+  const reloaded = await import('./siteFetch.js?reload-test');
+  assert.equal((await (await reloaded.siteFetch('/api/services')).json()).price, 499);
+  assert.equal(calls, 0);
+  reloaded.clearSiteCache();
+  assert.equal(data.size, 0);
+  assert.equal((await (await reloaded.siteFetch('/api/services')).json()).price, 599);
+  assert.equal(calls, 1);
+  data.set(key, JSON.stringify({ body: '{}', expires: Date.now() - 1 }));
+  const expired = await import('./siteFetch.js?expired-test');
+  await expired.siteFetch('/api/services');
+  assert.equal(calls, 2);
+});
+
 test("public fetch shares requests, clones bodies, and refreshes on invalidation", async (t) => {
   let calls = 0;
   t.mock.method(globalThis, "fetch", async () => { calls++; return Response.json({ price: calls === 1 ? 499 : 599 }); });

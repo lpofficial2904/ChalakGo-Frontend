@@ -1,6 +1,6 @@
-const widths = [320, 640, 960, 1440, 1920];
+const widths = [96, 160, 320, 640, 960, 1440, 1920];
 
-export function imageSources(src, sizes = "(max-width: 640px) 100vw, 50vw") {
+export function imageSources(src, sizes = "(max-width: 1023px) 100vw, (max-width: 1440px) 50vw, 640px") {
   if (!src || typeof src !== "string") return { src };
   let url;
   try { url = new URL(src, "https://relative.invalid"); } catch { return { src }; }

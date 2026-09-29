@@ -15,10 +15,11 @@ import {
 import { toast } from "sonner";
 import { API_BASE } from "../utils/api.js";
 
+const officeAddress = "2nd Floor, S-22, Apna Bazar, near Lata Circle, Krishna Colony, Jhotwara, Jaipur, Jaipur Nagar Nigam Area, Rajasthan 302012";
 const fallback = {
   phone: "+91 97845 10845",
   email: "support@chalakgo.in",
-  address: "Virasat Homes, Narayan Vihar, Jaipur, Rajasthan, India",
+  address: officeAddress,
 };
 const reveal = {
   initial: { opacity: 0, y: 26 },
@@ -89,10 +90,10 @@ export default function Contact() {
       `tel:${(settings.phone || "").replace(/\s/g, "")}`,
     ],
     [Mail, "Email us", settings.email, `mailto:${settings.email}`],
-    [MapPin, "Visit us", settings.address],
+    [MapPin, "Visit us", officeAddress],
     [Clock3, "Always available", "24/7 booking assistance"],
   ];
-  const mapQuery = encodeURIComponent("Mansarovar, Jaipur, Rajasthan, India");
+  const mapQuery = encodeURIComponent(`Chalak Go, ${officeAddress}`);
 
   return (
     <main className="overflow-hidden bg-[#f6f9ff] text-[#10213f]">
@@ -253,12 +254,10 @@ export default function Contact() {
               <p className="text-xs font-extrabold tracking-[.14em] text-blue-600"><PageText id="text_14">
                 FIND US
               </PageText></p>
-              <h2 className="mt-2 text-2xl font-extrabold text-[#10213f]"><PageText id="text_15">
-                Find us in Mansarovar, Jaipur
-              </PageText></h2>
-              <p className="mt-1 text-sm text-slate-500"><PageText id="text_16">
-                Mansarovar, Jaipur, Rajasthan, India
-              </PageText></p>
+              <h2 className="mt-2 text-2xl font-extrabold text-[#10213f]">
+                Find us in Jhotwara, Jaipur
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">{officeAddress}</p>
             </div>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${mapQuery}`}
@@ -270,8 +269,8 @@ export default function Contact() {
             </a>
           </div>
           <iframe
-            title="Mansarovar Jaipur map"
-            src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+            title="ChalakGo office near Lata Circle, Jhotwara, Jaipur"
+            src={`https://www.google.com/maps?q=${mapQuery}&z=17&output=embed`}
             className="h-72 w-full border-0 sm:h-96"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

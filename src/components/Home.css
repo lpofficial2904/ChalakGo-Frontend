@@ -1,0 +1,28 @@
+.home-service-grid { align-items: stretch; }
+.home-service-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #e0e7f1;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 8px 28px #10213f08;
+  transition: border-color .2s, box-shadow .2s;
+}
+.home-service-card:hover { border-color: #a7c8fa; box-shadow: 0 16px 36px #10213f12; }
+.home-service-media { overflow: hidden; border-radius: 20px; background: #f1f5f9; }
+.home-service-content { display: flex; flex: 1; flex-direction: column; align-items: flex-start; padding: 22px 14px 14px; overflow-wrap: anywhere; }
+.home-service-price { max-width: 100%; margin-bottom: 16px; padding: 7px 12px; border: 1px solid #dbeafe; border-radius: 9px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 700; line-height: 1.5; }
+.home-service-features { display: grid; gap: 9px; margin: 20px 0 0; color: #475569; font-size: 12px; line-height: 1.5; }
+.home-service-features span { display: flex; align-items: flex-start; gap: 8px; }
+.home-service-features svg { flex-shrink: 0; color: #2563eb; margin-top: 2px; }
+.home-service-button { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; margin-top: auto; padding: 13px 16px; border-radius: 12px; background: #0b2145; color: #fff; font-size: 14px; font-weight: 700; transition: background .2s; }
+
+
+
+.home-service-features { padding-bottom: 24px; }
+.home-service-content > p:not(.home-service-price) { margin-bottom: 20px; }
+.home-service-button:hover { background: #2563eb; }
+.home-service-button:focus-visible { outline: 3px solid #60a5fa; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .home-service-card, .home-service-button { transition: none; } }

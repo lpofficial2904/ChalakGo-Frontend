@@ -6,7 +6,7 @@ import react from "@vitejs/plugin-react";
 import { JSDOM } from "jsdom";
 import React, { act, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { DEFAULT_DRIVER_PRICING, calculateDriverOnlyFare } from "../../../shared/driverPricing.js";
+import { DEFAULT_DRIVER_PRICING, calculateDriverOnlyFare } from "../shared/driverPricing.js";
 import { calculateDistanceFare, calculateMonthlyFare, calculateFixedFare } from "../utils/fare.js";
 
 test("selecting a card immediately updates the estimate; schedules show extra and night charges", async () => {

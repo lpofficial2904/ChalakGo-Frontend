@@ -1,4 +1,4 @@
-import { pageCopyKey } from "../../../shared/pageCopyKey.js";
+import { pageCopyKey } from "../shared/pageCopyKey.js";
 import { createContext, useContext } from 'react';
 export const PageCopyContext = createContext({});
 export function PageText({ id, children }) {

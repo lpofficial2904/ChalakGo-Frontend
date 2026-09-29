@@ -1,0 +1,20 @@
+.pricing-page { overflow-wrap: anywhere; }
+.pricing-service-body { display: grid; gap: 24px; padding: clamp(20px, 3vw, 32px); }
+.pricing-service-body > * { min-width: 0; }
+.pricing-page .fare-panel { margin: 0; border: 0; border-radius: 0; background: transparent; }
+.pricing-page .fare-panel > div:first-child { padding: 0 0 14px; border: 0; }
+.pricing-page .fare-options { display: grid; gap: 12px; }
+.pricing-page .fare-row { min-width: 0; border: 1px solid #e2e8f0; border-radius: 14px; background: #f8faff; padding: 16px; }
+.pricing-page .fare-row-heading { display: flex; flex-direction: column; gap: 8px; }
+.pricing-page .fare-row-heading > p { color: #1d4ed8; font-size: 22px; line-height: 1.3; }
+.pricing-page .fare-row svg { flex-shrink: 0; }
+.pricing-page .fare-row-heading > div { width: 100%; }
+.pricing-page .fare-row-heading > div > p:first-child { align-items: flex-start; }
+.pricing-page .fare-row-heading > div > p:first-child svg { margin-top: 3px; }
+@media (min-width: 640px) {
+  .pricing-page .fare-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .pricing-service-body { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 32px; }
+  .pricing-page .fare-options { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

@@ -101,7 +101,7 @@ export default function FooterReviews() {
                   <div className="relative mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-sm font-extrabold leading-none text-white shadow-md shadow-blue-200">
                       {review.avatar ? (
-                        <SiteImage
+                        <SiteImage sizes="40px"
                           src={review.avatar}
                           alt={review.customerName}
                           className="h-full w-full object-cover"

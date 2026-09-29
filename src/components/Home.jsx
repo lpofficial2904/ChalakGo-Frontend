@@ -1,4 +1,6 @@
 import SiteImage from "./SiteImage.jsx";
+import "./Home.css";
+import { driverPricing } from "../shared/driverPricing.js";
 import { siteFetch } from "../utils/siteFetch.js";
 import { PageText, PageCopyContext } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
@@ -51,6 +53,10 @@ const reveal = {
 };
 
 function servicePriceLabel(service) {
+  if (service.slug === "driver-only") {
+    const pricing = driverPricing(service.driverPricing);
+    return `Plans from ₹${Math.min(...pricing.plans.map(plan => plan.price)).toLocaleString("en-IN")}`;
+  }
   if (service.pricingType === "distance" || service.slug === "car-driver") {
     const rates = Object.values(service.vehicleRates || {}).filter(
       (rate) => Number(rate) > 0,
@@ -144,7 +150,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.94, x: 24 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="relative"
+            className="relative min-w-0"
           >
             <div className="absolute -inset-4 rounded-[34px] bg-blue-400/15 blur-2xl" />
             <div className="relative overflow-hidden rounded-[30px] border border-white/15 shadow-2xl shadow-black/30">
@@ -152,9 +158,8 @@ export default function Home() {
                 src={assetUrl(copy.heroImage || heroImage) || fallbackHero}
                 onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackHero; }}
                 alt="ChalakGo professional driver service"
-                className="h-[380px] w-full object-cover sm:h-[510px]"
+                className="block aspect-square w-full bg-[#edf2fa] object-contain"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#06142d]/75 via-transparent to-transparent" />
               <motion.div
                 animate={{ y: [0, -7, 0] }}
                 transition={{
@@ -162,7 +167,7 @@ export default function Home() {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/20 bg-[#071a37]/75 p-4 backdrop-blur-md"
+                className="relative border-t border-white/20 bg-[#071a37] p-4"
               >
                 <div className="flex items-center gap-3">
                   <span className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-300 text-[#06142d]">
@@ -221,32 +226,32 @@ function ServicesPreview({ services }) {
             Explore all services </PageText><ArrowRight size={18} />
           </Link>
         </motion.div>
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+        <div className="home-service-grid mt-10 grid gap-6 lg:grid-cols-3">
           {services.slice(0, 3).map((service, index) => (
             <motion.article
               {...reveal}
               transition={{ delay: index * 0.1 }}
               key={service.slug}
-              className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(25,54,96,.08)] transition hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(25,54,96,.14)]"
+              className="home-service-card group"
             >
-              <div className="relative overflow-hidden">
-                <SiteImage sizes="(max-width: 640px) 100vw, 33vw" src={assetUrl(service.image)}
+              <div className="home-service-media">
+                <SiteImage sizes="(max-width: 1023px) 100vw, (max-width: 1440px) 33vw, 410px" src={assetUrl(service.image)}
                   alt={service.name}
-                  className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
+                  className="block aspect-square w-full bg-slate-100 object-contain"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#061a39]/70 via-transparent to-transparent" />
-                <p className="absolute bottom-4 left-5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-extrabold text-blue-700">
-                  {servicePriceLabel(service)}
-                </p>
               </div>
-              <div className="p-7">
+              <div className="home-service-content">
+                <p className="home-service-price">{servicePriceLabel(service)}</p>
                 <h3 className="text-2xl font-extrabold">{service.name}</h3>
-                <p className="mt-3 min-h-12 text-sm leading-6 text-slate-500">
+                <p className="mt-3 text-sm leading-6 text-slate-500">
                   {service.detail}
                 </p>
+                {service.features?.length > 0 && <div className="home-service-features">
+                  {service.features.slice(0, 2).map(feature => <span key={feature}><CheckCircle2 size={15} aria-hidden="true" />{feature}</span>)}
+                </div>}
                 <Link
                   to={`/services/${service.slug}`}
-                  className="mt-6 inline-flex items-center gap-2 font-extrabold text-blue-600"
+                  className="home-service-button"
                 ><PageText id="text_12">
                   View details </PageText><ArrowRight size={17} />
                 </Link>

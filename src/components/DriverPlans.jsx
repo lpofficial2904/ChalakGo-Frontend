@@ -1,4 +1,4 @@
-import { driverPricing } from "../../../shared/driverPricing.js";
+import { driverPricing } from "../shared/driverPricing.js";
 
 const money = (value) => `₹${Number(value).toLocaleString("en-IN")}`;
 

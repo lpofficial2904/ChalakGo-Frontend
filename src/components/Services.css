@@ -1,0 +1,83 @@
+.service-detail-media {
+  position: relative;
+  height: clamp(260px, 85vw, 420px);
+  min-width: 0;
+  background: #edf2fa;
+}
+
+.service-detail-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (min-width: 1024px) {
+  .service-detail-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+
+  .service-detail-media {
+    /* Keep the uploaded image's natural dimensions out of grid row sizing. */
+    height: auto;
+    min-height: 360px;
+  }
+}
+.pickup-panel {
+  min-width: 0;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid #dbe7f6;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #f0f6ff, #fff 75%);
+}
+.pickup-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #dbeafe;
+  color: #2563eb;
+}
+.pickup-mode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 12px;
+  border: 1px solid #dce4ef;
+  border-radius: 14px;
+  background: #fff;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color .2s, background .2s;
+}
+.pickup-mode:hover { border-color: #2563eb; }
+.pickup-mode-active { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; box-shadow: 0 0 0 1px #2563eb; }
+.pickup-mode:disabled { opacity: .6; cursor: wait; }
+.pickup-result { margin-top: 20px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; }
+.pickup-result-confirmed { border-color: #a7e3c5; background: #f0fdf7; color: #047857; }
+.booking-submit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 28px;
+  padding: 18px;
+  border-radius: 16px;
+  background: linear-gradient(110deg, #2563eb, #1d4ed8);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 8px 18px #2563eb26;
+  transition: box-shadow .2s;
+}
+.booking-submit:hover { box-shadow: 0 10px 24px #2563eb40; }
+.booking-submit:disabled { opacity: .6; cursor: wait; }
+.pickup-panel button:focus-visible, .booking-submit:focus-visible { outline: 3px solid #60a5fa; outline-offset: 4px; }

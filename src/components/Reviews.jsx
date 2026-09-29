@@ -136,7 +136,7 @@ function ReviewCard({ review, index }) {
       <div className="relative mt-7 flex items-center gap-3 border-t border-slate-100 pt-5">
         <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 font-extrabold text-white">
           {review.avatar ? (
-            <SiteImage
+            <SiteImage sizes="44px"
               src={review.avatar}
               alt={review.customerName}
               className="h-full w-full object-cover"

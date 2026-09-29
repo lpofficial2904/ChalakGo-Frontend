@@ -1,15 +1,17 @@
 import SiteImage from "./SiteImage.jsx";
+import { MapPin, LocateFixed, PencilLine, CheckCircle2, RefreshCw, ArrowRight, LoaderCircle } from "lucide-react";
+import "./Services.css";
 import ServiceFareEstimate from "./ServiceFareEstimate.jsx";
 import DriverFareEstimate from "./DriverFareEstimate.jsx";
 import { siteFetch } from "../utils/siteFetch.js";
 import DriverPlans from "./DriverPlans.jsx";
-import { driverPricing } from "../../../shared/driverPricing.js";
+import { driverPricing } from "../shared/driverPricing.js";
 import { PageText } from "./PageCopy.jsx";
-import { contentOf } from "../../../shared/serviceContent.js";
+import { contentOf } from "../shared/serviceContent.js";
 import { useLiveEffect } from "./LiveSite";
 import { usePageSeo } from "./Seo.jsx";
 import { assetUrl } from "../utils/assets.js";
-import CabPricing from "./CabPricing";
+import CabPlans from "./CabPlans.jsx";
 import {
   readBookingDraft,
   saveBookingDraft,
@@ -228,7 +230,7 @@ function ServiceList({ services }) {
                 <SiteImage
                   src={assetUrl(item.image)}
                   alt={item.name}
-                  className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
+                  className="aspect-square w-full bg-slate-100 object-contain"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#071a37]/75 via-transparent to-transparent" />
                 {item.slug !== "car-driver" && (
@@ -273,23 +275,24 @@ function ServiceList({ services }) {
 }
 function ServiceDetails({ service }) {
   if (service.slug === "jaipur-tour") return <JaipurTour service={service} />;
-  const permanent = service.slug === "permanent-driver";
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,_#dbeafe,_transparent_32rem),#f7f9fc] px-5 py-10 text-[#101a31] sm:py-14">
       <section className="mx-auto max-w-6xl">
         <Link to="/services" className="text-sm font-bold text-blue-600">
           ← All services
         </Link>
-        <div className="relative mt-6 overflow-hidden rounded-[32px] bg-[#071a36] text-white shadow-2xl lg:grid lg:grid-cols-[1.08fr_.92fr]">
+        <div className="service-detail-hero relative mt-6 overflow-hidden rounded-[32px] bg-[#071a36] text-white shadow-2xl">
+          <div className="service-detail-media">
           <SiteImage priority
             src={assetUrl(service.image)}
             alt={service.name}
             onError={(event) => {
               event.currentTarget.src = "https://images.unsplash.com/photo-1599661046827-dacde6976540?auto=format&fit=crop&w=1400&q=85";
             }}
-            className="h-80 w-full object-cover opacity-85 lg:h-full"
+            className="service-detail-image"
           />
-          <div className="p-8 sm:p-11">
+          </div>
+          <div className="min-w-0 self-center p-6 sm:p-9">
             <p className="text-sm font-bold text-blue-300">{service.eyebrow}</p>
             <h1 className="mt-3 text-4xl font-extrabold">{service.name}</h1>
             <p className="mt-4 text-lg leading-7 text-slate-300">
@@ -302,15 +305,11 @@ function ServiceDetails({ service }) {
                 </li>
               ))}
             </ul>
-            {service.slug === "car-driver" ? (
-              <CabPricing service={service} dark />
-            ) : (
+            {service.slug !== "car-driver" && (service.slug === "driver-only" || service.price) ? (
               <p className="mt-8 text-3xl font-extrabold">{service.slug === "driver-only" ? `Plans from ₹${Math.min(...driverPricing(service.driverPricing).plans.map(plan => plan.price)).toLocaleString("en-IN")}` : service.price}</p>
-            )}
+            ) : null}
           </div>
         </div>
-        {permanent && <PermanentInfo service={service} />}
-        <AdditionalContent service={service} />
         <BookingForm service={service} />
       </section>
     </main>
@@ -359,16 +358,18 @@ function JaipurTour({ service }) {
         <Link to="/services" className="text-sm font-bold text-blue-600">
           ← All services
         </Link>
-        <div className="mt-6 overflow-hidden rounded-3xl bg-[#0b1c38] text-white shadow-xl lg:grid lg:grid-cols-2">
+        <div className="service-detail-hero mt-6 overflow-hidden rounded-3xl bg-[#0b1c38] text-white shadow-xl">
+          <div className="service-detail-media">
           <SiteImage priority
             src={assetUrl(service.image)}
             alt="Jaipur sightseeing"
             onError={(event) => {
               event.currentTarget.src = "https://images.unsplash.com/photo-1599661046827-dacde6976540?auto=format&fit=crop&w=1400&q=85";
             }}
-            className="h-72 w-full object-cover lg:h-full"
+            className="service-detail-image"
           />
-          <div className="relative p-8 sm:p-12">
+          </div>
+          <div className="relative min-w-0 self-center p-6 sm:p-9">
             <div className="absolute right-0 top-0 h-40 w-40 rounded-full border-[28px] border-blue-400/15" />
             <p className="relative text-xs font-extrabold tracking-[.2em] text-cyan-300">
               PRIVATE SIGHTSEEING · JAIPUR
@@ -400,7 +401,7 @@ function JaipurTour({ service }) {
                 <SiteImage
                   src={assetUrl(plan.image)}
                   alt={plan.title || `${plan.days}-day Jaipur Tour`}
-                  className="mb-6 h-40 w-full rounded-2xl object-cover"
+                  className="mb-6 h-56 w-full rounded-2xl bg-slate-100 object-contain"
                 />
               )}
               <div className="flex items-center justify-between"><p className="font-bold text-blue-600">JAIPUR SIGHTSEEING</p><span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700">{plan.days} DAY</span></div>
@@ -445,7 +446,7 @@ function JaipurTour({ service }) {
               <SiteImage
                 src={assetUrl(active.image)}
                 alt={active.title || `${active.days}-day Jaipur Tour`}
-                className="mt-7 h-64 w-full rounded-2xl object-cover"
+                className="mt-7 h-64 w-full rounded-2xl bg-slate-100 object-contain"
               />
             )}
             {active.description && (
@@ -716,7 +717,7 @@ function TourBookingForm({ service, plan }) {
   );
 }
 
-function PermanentInfo({ service }) {
+function PermanentInfo({ service, selected, onSelect }) {
   const content = contentOf(service);
   const monthlyRates = {
     sixToEight: 15000,
@@ -772,7 +773,7 @@ function PermanentInfo({ service }) {
           {plans.map(([timing, leave, salary]) => (
             <article
               key={timing}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              className={`rounded-2xl border p-6 shadow-sm ${selected === timing ? "border-blue-600 bg-blue-50 ring-2 ring-blue-600" : "border-slate-200 bg-white"}`}
             >
               <h3 className="text-xl font-extrabold">{timing}</h3>
               <p className="mt-4 text-sm text-slate-600">
@@ -781,6 +782,15 @@ function PermanentInfo({ service }) {
               <p className="mt-2 text-sm text-slate-600">
                 <b className="text-[#10213f]">Salary:</b> {salary}
               </p>
+              <button
+                type="button"
+                aria-label={`Select ${timing}`}
+                aria-pressed={selected === timing}
+                onClick={() => onSelect(timing)}
+                className={`mt-5 w-full rounded-lg px-4 py-2.5 text-sm font-semibold ${selected === timing ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-800 hover:bg-blue-100"}`}
+              >
+                {selected === timing ? "Selected ✓" : "Select Plan →"}
+              </button>
             </article>
           ))}
         </div>
@@ -1146,7 +1156,10 @@ function BookingForm({ service }) {
   ) : temporary && <ServiceFareEstimate kind="hourly" selected={service.name} fare={fare} error={fareError} />;
   return (
     <>
+    {permanent && <PermanentInfo service={service} selected={form.duration} onSelect={(duration) => setForm((old) => ({ ...old, duration }))} />}
+    <AdditionalContent service={service} />
     {driverOnly && <DriverPlans pricing={pricing} selected={form.driverPackage} onSelect={(driverPackage) => setForm((old) => ({ ...old, driverPackage }))} />}
+    {distanceBased && <CabPlans service={service} selected={form.carType} onSelect={(carType) => setForm((old) => ({ ...old, carType }))} />}
     <motion.form
       id="booking"
       initial={{ opacity: 0, y: 25 }}
@@ -1227,57 +1240,71 @@ function BookingForm({ service }) {
         {driverOnly && <DriverPlans compact pricing={pricing} selected={form.driverPackage} onSelect={(driverPackage) => setForm((old) => ({ ...old, driverPackage }))} />}
         {schedules}
         {temporaryEstimate}
-        <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 sm:col-span-2">
-          <p className="text-sm font-bold">Pickup location</p>
-          <div className="mt-3 flex flex-wrap gap-3">
+        <div className="pickup-panel sm:col-span-2">
+          <div className="flex items-center gap-3">
+            <span className="pickup-icon"><MapPin size={23} aria-hidden="true" /></span>
+            <div><h3 className="text-lg font-extrabold">Where should we pick you up?</h3><p className="mt-1 text-sm text-slate-500">Use your location or add your pickup address.</p></div>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <button
               type="button"
               aria-pressed={locationMode === "current"}
               disabled={loading}
               onClick={() => chooseMode("current")}
-              className={`rounded-lg px-3 py-2 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-60 ${locationMode === "current" ? "bg-blue-600 text-white" : "border border-blue-200 text-blue-700"}`}
+              className={`pickup-mode ${locationMode === "current" ? "pickup-mode-active" : ""}`}
             >
+              <LocateFixed size={19} aria-hidden="true" />
               {loading ? "Detecting…" : "Use current location"}
             </button>
             <button
               type="button"
               aria-pressed={locationMode === "manual"}
               onClick={() => chooseMode("manual")}
-              className={`rounded-lg px-3 py-2 text-xs font-bold ${locationMode === "manual" ? "bg-blue-600 text-white" : "border border-blue-200 text-blue-700"}`}
+              className={`pickup-mode ${locationMode === "manual" ? "pickup-mode-active" : ""}`}
             >
+              <PencilLine size={18} aria-hidden="true" />
               Enter manually
             </button>
           </div>
           {locationMode === "current" && (
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-slate-600">
+            <div className={`pickup-result ${confirmedPickup && !loading && !error ? "pickup-result-confirmed" : ""}`}>
+              <div className="flex items-center gap-2 font-bold" role="status">
+                {loading ? <LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> : confirmedPickup && !error ? <CheckCircle2 size={19} aria-hidden="true" /> : <MapPin size={19} aria-hidden="true" />}
+                {loading ? "Finding your pickup point" : error ? "Location needs your attention" : confirmedPickup ? "Pickup location confirmed" : coordinates ? "Your pickup point is ready" : "Find your pickup point"}
+              </div>
+              <p className="mt-2 text-sm text-slate-600" aria-live="polite">
                 {loading ? acquisitionStatus : error || label}
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-3">
                 <button
                   type="button"
                   disabled={loading}
                   onClick={() => chooseMode("current")}
-                  className="rounded-lg border border-blue-300 px-3 py-2 text-xs font-bold text-blue-700 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-blue-400 disabled:opacity-60"
                 >
+                  <RefreshCw size={15} className={loading ? "animate-spin" : ""} aria-hidden="true" />
                   {loading ? "Fetching…" : "Refresh current location"}
                 </button>
                 <button
                   type="button"
                   disabled={loading || !coordinates}
                   onClick={confirmPickup}
-                  className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-60"
+                  className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition disabled:opacity-60 ${confirmedPickup ? "bg-emerald-600 hover:bg-emerald-700" : "bg-blue-600 hover:bg-blue-700"}`}
                 >
+                  <CheckCircle2 size={16} aria-hidden="true" />
                   {confirmedPickup
                     ? "Pickup location confirmed"
                     : "Confirm pickup location"}
                 </button>
               </div>
-              <p className="w-full break-words text-xs text-slate-600">
+              <details className="mt-4 text-xs text-slate-500">
+                <summary className="cursor-pointer font-medium">Location details</summary>
+              <p className="mt-2 break-all">
                 {coordinates
                   ? `🌍 Latitude: ${coordinates.latitude} | Longitude: ${coordinates.longitude}`
                   : "GPS coordinates will be captured after detection."}
               </p>
+              </details>
             </div>
           )}
         </div>
@@ -1308,12 +1335,14 @@ function BookingForm({ service }) {
       </div>
       <button
         disabled={submitting || (loading && locationMode === "current")}
-        className="mt-7 w-full rounded-xl bg-blue-600 py-4 font-bold text-white shadow-lg shadow-blue-200"
+        className="booking-submit"
       >
+        {submitting && <LoaderCircle size={19} className="animate-spin" aria-hidden="true" />}
         {submitting ? "Saving booking..." : "Submit Booking Request"}
+        {!submitting && <ArrowRight size={19} aria-hidden="true" />}
       </button>
       {status && (
-        <p className="mt-4 text-center font-medium text-blue-700">{status}</p>
+        <p role="status" className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-center text-sm leading-6 text-slate-600">{status}</p>
       )}
     </motion.form>
     </>
