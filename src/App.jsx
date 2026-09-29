@@ -2,7 +2,7 @@ import { siteFetch } from "./utils/siteFetch.js";
 import { PageCopyContext } from "./components/PageCopy.jsx";
 import { useLiveEffect } from "./components/LiveSite";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 const About = lazy(() => import("./components/About.jsx"));
 const Blog = lazy(() => import("./components/Blog.jsx"));
 const Contact = lazy(() => import("./components/Contact.jsx"));
@@ -18,6 +18,7 @@ const Services = lazy(() => import("./components/Services.jsx"));
 import SiteLayout from "./components/SiteLayout";
 import { API_BASE } from "./utils/api.js";
 import { usePageSeo } from "./components/Seo.jsx";
+import { legacyServicePaths } from "./utils/serviceRoutes.js";
 const Terms = lazy(() => import("./components/Terms.jsx"));
 
 // Every visitor page shares the same header, navigation, and footer.
@@ -54,7 +55,7 @@ function editableRoute(path, slug, Page, options = {}) {
 function EditablePage({ slug, Page, showFooterReviews = true }) {
   const [page, setPage] = useState(null);
   const metadata = page?.slug === slug ? page : null;
-  usePageSeo({ title: metadata?.seoTitle || (!metadata?.statusOnly && metadata?.title), description: metadata?.seoDescription || metadata?.excerpt });
+  usePageSeo({ title: slug === "home" ? undefined : metadata?.seoTitle || (!metadata?.statusOnly && metadata?.title), description: slug === "home" ? undefined : metadata?.seoDescription || metadata?.excerpt });
   useLiveEffect(() => {
     const controller = new AbortController();
     // Built-in pages work without a published CMS override. Look up optional
@@ -110,6 +111,12 @@ function EditablePage({ slug, Page, showFooterReviews = true }) {
   );
 }
 
+function LegacyServiceRoute() {
+  const { service } = useParams();
+  const destination = legacyServicePaths[`/services/${service}`];
+  return destination ? <Navigate replace to={destination} /> : <Services />;
+}
+
 export default function App() {
   return (
     <Suspense fallback={<main className="px-5 py-24 text-center text-slate-600" role="status">Loading page...</main>}>
@@ -121,7 +128,12 @@ export default function App() {
       {publicRoute("/login", Login, { showFooterReviews: false })}
       {editableRoute("/pricing", "pricing", Pricing)}
       {editableRoute("/services", "services", Services)}
-      {publicRoute("/services/:service", Services)}
+      {publicRoute("/chauffeur-service-jaipur", Services)}
+      {publicRoute("/cab-car-driver-jaipur", Services)}
+      {publicRoute("/driver-on-demand-jaipur", Services)}
+      {publicRoute("/jaipur-tour-by-car", Services)}
+      {publicRoute("/permanent-driver-jaipur", Services)}
+      <Route path="/services/:service" element={<PublicPage><LegacyServiceRoute /></PublicPage>} />
       {editableRoute("/blog", "blog", Blog)}
       {publicRoute("/blog/:slug", Blog)}
       {publicRoute("/p/:slug", ManagedPage)}

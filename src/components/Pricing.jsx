@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { API_BASE } from "../utils/api.js";
 import CabPricing from "./CabPricing";
 import "./Pricing.css";
+import { servicePath } from "../utils/serviceRoutes.js";
 
 const fallbackServices = [
   {
@@ -143,7 +144,7 @@ export default function Pricing() {
                     </p>
                   )}
                   <Link
-                    to={`/services/${service.slug}`}
+                    to={servicePath(service.slug)}
                     className="mt-6 inline-flex max-w-full items-center justify-between gap-4 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600"
                   >
                     <PageText id="cardButton">View details &amp; book</PageText> <ArrowRight size={18} />

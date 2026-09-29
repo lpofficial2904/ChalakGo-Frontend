@@ -1,1 +1,9 @@
+/services/car-driver /cab-car-driver-jaipur 301!
+/services/driver-only /driver-on-demand-jaipur 301!
+/services/jaipur-tour /jaipur-tour-by-car 301!
+/services/permanent-driver /permanent-driver-jaipur 301!
+/services/car-driver/ /cab-car-driver-jaipur 301!
+/services/driver-only/ /driver-on-demand-jaipur 301!
+/services/jaipur-tour/ /jaipur-tour-by-car 301!
+/services/permanent-driver/ /permanent-driver-jaipur 301!
 /* /index.html 200

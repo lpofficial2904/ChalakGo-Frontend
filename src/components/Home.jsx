@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { API_BASE } from "../utils/api.js";
+import { servicePath } from "../utils/serviceRoutes.js";
 
 const fallbackServices = [
   {
@@ -118,14 +119,13 @@ export default function Home() {
               <ShieldCheck size={15} className="text-cyan-300" /><PageText id="text_1"> VERIFIED
               PROFESSIONAL DRIVERS
             </PageText></p>
-            <h1 className="mt-7 max-w-3xl text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl xl:text-7xl"><PageText id="text_2">
-              Your car. Our driver.
-              </PageText><span className="block text-blue-300"><PageText id="text_3">Total peace of mind.</PageText></span>
+            <h1 className="mt-7 max-w-3xl text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl xl:text-7xl">
+              Premium Car with Professional Chauffeur in Jaipur
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-300"><PageText id="text_4">
-              Professional, background-checked drivers for everyday travel,
-              special occasions and business journeys—whenever you need one.
-            </PageText></p>
+            <h2 className="mt-3 text-lg font-bold text-blue-200">Your Car, Our Expert Driver</h2>
+            <p className="mt-4 max-w-xl text-lg leading-8 text-slate-300">
+              Book a professional driver in Jaipur for your own car, a chauffeur-driven cab, a dedicated monthly driver or a private Jaipur sightseeing tour. Choose the service that fits your journey.
+            </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
                 to="/services"
@@ -250,7 +250,7 @@ function ServicesPreview({ services }) {
                   {service.features.slice(0, 2).map(feature => <span key={feature}><CheckCircle2 size={15} aria-hidden="true" />{feature}</span>)}
                 </div>}
                 <Link
-                  to={`/services/${service.slug}`}
+                  to={servicePath(service.slug)}
                   className="home-service-button"
                 ><PageText id="text_12">
                   View details </PageText><ArrowRight size={17} />
@@ -259,6 +259,17 @@ function ServicesPreview({ services }) {
             </motion.article>
           ))}
         </div>
+        <nav aria-label="ChalakGo services" className="mt-10 flex flex-wrap gap-3">
+          {[
+            ["Premium chauffeur service", "/chauffeur-service-jaipur"],
+            ["Cab with car and driver", "/cab-car-driver-jaipur"],
+            ["Driver for your own car", "/driver-on-demand-jaipur"],
+            ["Private Jaipur sightseeing tour", "/jaipur-tour-by-car"],
+            ["Permanent monthly driver", "/permanent-driver-jaipur"],
+          ].map(([label, path]) => (
+            <Link key={path} to={path} className="rounded-full border border-blue-100 bg-white px-4 py-2 text-sm font-bold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50">{label}</Link>
+          ))}
+        </nav>
       </div>
     </section>
   );

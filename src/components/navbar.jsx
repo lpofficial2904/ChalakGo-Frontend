@@ -9,6 +9,7 @@ import { ChevronDown, LogOut, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { API_BASE } from "../utils/api.js";
 import { clearUserSession, tokenExpiryDelay, USER_SESSION_EVENT } from "../utils/session.js";
+import { servicePath } from "../utils/serviceRoutes.js";
 
 const menuLinks = [
   ["Home", "/"],
@@ -150,7 +151,7 @@ export default function Navbar() {
     services.map((service) => (
       <Link
         key={service.slug}
-        to={`/services/${service.slug}`}
+        to={servicePath(service.slug)}
         onClick={close}
         className={className}
       >

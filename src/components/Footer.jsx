@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { SiteLink as Link, SiteNavLink as NavLink } from "./LiveSite";
 import { Clock3, Mail, MapPin, Phone } from "lucide-react";
 import { API_BASE } from "../utils/api.js";
+import { servicePath } from "../utils/serviceRoutes.js";
 
 const defaults = {
   siteName: "ChalakGo",
@@ -85,8 +86,7 @@ export default function Footer() {
               </p>
             )}
             <p className="mt-5 max-w-[16rem] text-sm leading-7 text-slate-400">
-              Professional driver services for daily travel, business journeys
-              and every special occasion.
+              Jaipur driver on hire, chauffeur-driven cab bookings, monthly drivers and private sightseeing tours for local and outstation travel.
             </p>
             {socialLinks.length > 0 && (
               <div className="mt-6 flex flex-wrap gap-2">
@@ -121,7 +121,7 @@ export default function Footer() {
             title="Our Services"
             links={services.map((service) => [
               service.name,
-              `/services/${service.slug}`,
+              servicePath(service.slug),
             ])}
             empty="New services will appear here."
           />

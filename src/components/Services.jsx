@@ -10,6 +10,8 @@ import { PageText } from "./PageCopy.jsx";
 import { contentOf } from "../shared/serviceContent.js";
 import { useLiveEffect } from "./LiveSite";
 import { usePageSeo } from "./Seo.jsx";
+import { serviceSeoPages } from "./Seo.jsx";
+import { servicePath } from "../utils/serviceRoutes.js";
 import { assetUrl } from "../utils/assets.js";
 import CabPlans from "./CabPlans.jsx";
 import {
@@ -163,25 +165,51 @@ const jaipurTour = {
     },
   ],
 };
+const serviceSeoTitles = {
+  "driver-only": "Driver on Rent in Jaipur | Driver Only Service",
+  "car-driver": "Chauffeur Driven Car Rental in Jaipur | ChalakGo",
+  "jaipur-tour": "Jaipur Sightseeing Tour by Private Car & Driver",
+  "permanent-driver": "Monthly Driver Service in Jaipur | Permanent Chauffeur",
+};
 
 export default function Services() {
-  const { service: slug } = useParams();
+  const { service: routeSlug } = useParams();
+  const { pathname } = useLocation();
+  const pagePath = pathname.replace(/\/+$/, "") || "/";
+  const pageConfig = serviceSeoPages[pagePath];
+  const slug = pageConfig?.slug || routeSlug;
   const [services, setServices] = useState([...defaultServices, jaipurTour]);
+  const [servicesLoaded, setServicesLoaded] = useState(false);
   // Published services saved from Admin render here automatically.
   useLiveEffect(() => {
     siteFetch(`${API_BASE}/api/services`)
       .then((r) => (r.ok ? r.json() : null))
       .then((items) => {
         if (Array.isArray(items)) setServices(items);
+        setServicesLoaded(true);
       })
-      .catch(() => {});
+      .catch(() => setServicesLoaded(true));
   }, []);
   const selected = services.find((item) => item.slug === slug);
-  usePageSeo({ title: selected?.name, description: selected?.detail, image: selected?.image ? assetUrl(selected.image) : undefined });
+  const seoTitle = pageConfig?.title || (selected ? serviceSeoTitles[selected.slug] || `${selected.name} in Jaipur` : undefined);
+  usePageSeo({ title: seoTitle || (routeSlug && !selected ? "Service Not Found" : undefined), description: pageConfig?.description, image: selected?.image ? assetUrl(selected.image) : undefined, noindex: Boolean(routeSlug && !selected) });
+  if (routeSlug && !selected) {
+    return servicesLoaded ? <ServiceNotFound /> : <main className="px-5 py-24 text-center text-slate-600" role="status">Loading service...</main>;
+  }
   return selected ? (
-    <ServiceDetails service={selected} />
+    <ServiceDetails service={selected} pageConfig={pageConfig} />
   ) : (
     <ServiceList services={services} />
+  );
+}
+
+function ServiceNotFound() {
+  return (
+    <main className="min-h-[50vh] px-5 py-24 text-center text-[#10213f]">
+      <h1 className="text-4xl font-extrabold">Service not found</h1>
+      <p className="mt-4 text-slate-600">This service is unavailable. Browse the current ChalakGo services.</p>
+      <Link to="/services" className="mt-7 inline-flex rounded-xl bg-blue-600 px-5 py-3 font-bold text-white">View services</Link>
+    </main>
   );
 }
 
@@ -260,7 +288,7 @@ function ServiceList({ services }) {
                   ))}
                 </div>
                 <Link
-                  to={`/services/${item.slug}`}
+                  to={servicePath(item.slug)}
                   className="mt-auto pt-6 text-sm font-extrabold text-blue-600 transition group-hover:text-blue-800"
                 >
                   Explore service &amp; book →
@@ -273,8 +301,8 @@ function ServiceList({ services }) {
     </main>
   );
 }
-function ServiceDetails({ service }) {
-  if (service.slug === "jaipur-tour") return <JaipurTour service={service} />;
+function ServiceDetails({ service, pageConfig }) {
+  if (service.slug === "jaipur-tour") return <JaipurTour service={service} pageConfig={pageConfig} />;
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,_#dbeafe,_transparent_32rem),#f7f9fc] px-5 py-10 text-[#101a31] sm:py-14">
       <section className="mx-auto max-w-6xl">
@@ -285,7 +313,7 @@ function ServiceDetails({ service }) {
           <div className="service-detail-media">
           <SiteImage priority
             src={assetUrl(service.image)}
-            alt={service.name}
+            alt={pageConfig?.h1 || service.name}
             onError={(event) => {
               event.currentTarget.src = "https://images.unsplash.com/photo-1599661046827-dacde6976540?auto=format&fit=crop&w=1400&q=85";
             }}
@@ -294,7 +322,8 @@ function ServiceDetails({ service }) {
           </div>
           <div className="min-w-0 self-center p-6 sm:p-9">
             <p className="text-sm font-bold text-blue-300">{service.eyebrow}</p>
-            <h1 className="mt-3 text-4xl font-extrabold">{service.name}</h1>
+            <h1 className="mt-3 text-4xl font-extrabold">{pageConfig?.h1 || service.name}</h1>
+            {pageConfig?.supportingHeading && <h2 className="mt-3 text-lg font-bold text-blue-200">{pageConfig.supportingHeading}</h2>}
             <p className="mt-4 text-lg leading-7 text-slate-300">
               {service.detail}
             </p>
@@ -310,13 +339,14 @@ function ServiceDetails({ service }) {
             ) : null}
           </div>
         </div>
+        {pageConfig && <ServiceSeoContent pageConfig={pageConfig} />}
         <BookingForm service={service} />
       </section>
     </main>
   );
 }
 
-function JaipurTour({ service }) {
+function JaipurTour({ service, pageConfig }) {
   const content = contentOf(service);
   const fallbackPlans = [
     {
@@ -362,7 +392,7 @@ function JaipurTour({ service }) {
           <div className="service-detail-media">
           <SiteImage priority
             src={assetUrl(service.image)}
-            alt="Jaipur sightseeing"
+            alt={pageConfig?.h1 || "Jaipur sightseeing tour by car"}
             onError={(event) => {
               event.currentTarget.src = "https://images.unsplash.com/photo-1599661046827-dacde6976540?auto=format&fit=crop&w=1400&q=85";
             }}
@@ -374,7 +404,8 @@ function JaipurTour({ service }) {
             <p className="relative text-xs font-extrabold tracking-[.2em] text-cyan-300">
               PRIVATE SIGHTSEEING · JAIPUR
             </p>
-            <h1 className="relative mt-3 text-4xl font-extrabold sm:text-5xl">{service.name}</h1>
+            <h1 className="relative mt-3 text-4xl font-extrabold sm:text-5xl">{pageConfig?.h1 || service.name}</h1>
+            {pageConfig?.supportingHeading && <h2 className="relative mt-3 text-lg font-bold text-blue-200">{pageConfig.supportingHeading}</h2>}
             <p className="relative mt-5 text-base leading-7 text-slate-300">
               Your private car, professional driver and a thoughtfully planned Pink City itinerary — all in one effortless day out.
             </p>
@@ -472,9 +503,44 @@ function JaipurTour({ service }) {
           </section>
         )}
         <AdditionalContent service={service} />
+        {pageConfig && <ServiceSeoContent pageConfig={pageConfig} />}
         <TourBookingForm service={service} plan={active} />
       </section>
     </main>
+  );
+}
+
+function ServiceSeoContent({ pageConfig }) {
+  return (
+    <section className="mt-10 space-y-7 rounded-3xl border border-slate-200 bg-white p-6 sm:p-9">
+      <p className="max-w-4xl text-base leading-7 text-slate-600">{pageConfig.intro}</p>
+      {pageConfig.sections.map(([heading, body]) => (
+        <section key={heading}>
+          <h2 className="text-2xl font-extrabold">{heading}</h2>
+          <p className="mt-3 max-w-4xl leading-7 text-slate-600">{body}</p>
+        </section>
+      ))}
+      <nav aria-label="Related services" className="border-t border-slate-200 pt-6">
+        <h2 className="text-xl font-extrabold">Explore related ChalakGo services</h2>
+        <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-3">
+          {pageConfig.related.map((path) => {
+            const related = serviceSeoPages[path];
+            return <li key={path}><Link className="font-semibold text-blue-700 underline-offset-4 hover:underline" to={path}>{related.serviceName}</Link></li>;
+          })}
+        </ul>
+      </nav>
+      <section>
+        <h2 className="text-2xl font-extrabold">Frequently asked questions</h2>
+        <div className="mt-4 divide-y divide-slate-200">
+          {pageConfig.faqs.map(([question, answer]) => (
+            <details key={question} className="py-4">
+              <summary className="cursor-pointer font-bold text-[#10213f]">{question}</summary>
+              <p className="mt-3 leading-7 text-slate-600">{answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    </section>
   );
 }
 
@@ -562,7 +628,7 @@ function TourBookingForm({ service, plan }) {
         planDays: plan?.days,
       });
       return navigate("/login", {
-        state: { returnTo: `/services/${service.slug}#booking` },
+        state: { returnTo: `${servicePath(service.slug)}#booking` },
       });
     }
     setSaving(true);
@@ -985,7 +1051,7 @@ function BookingForm({ service }) {
         confirmedPickup,
       });
       return navigate("/login", {
-        state: { returnTo: `/services/${service.slug}#booking` },
+        state: { returnTo: `${servicePath(service.slug)}#booking` },
       });
     }
     if (!/^[6-9][0-9]{9}$/.test(form.phone))

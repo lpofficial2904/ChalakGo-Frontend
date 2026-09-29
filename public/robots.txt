@@ -1,0 +1,7 @@
+﻿User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /admin/
+Disallow: /dashboard/
+
+Sitemap: https://chalakgo.com/sitemap.xml
