@@ -5,10 +5,7 @@ import { assetUrl } from "../utils/assets.js";
 import { useEffect, useState } from "react";
 import { SiteLink as Link, SiteNavLink as NavLink } from "./LiveSite";
 import defaultLogo from "../assets/chalakgo-logo.webp";
-import { ChevronDown, LogOut, UserRound } from "lucide-react";
-import { toast } from "sonner";
 import { API_BASE } from "../utils/api.js";
-import { clearUserSession, tokenExpiryDelay, USER_SESSION_EVENT } from "../utils/session.js";
 import { servicePath } from "../utils/serviceRoutes.js";
 
 const menuLinks = [
@@ -36,32 +33,7 @@ export default function Navbar() {
     navbarLogo: "",
     mainFavicon: "",
   });
-  const [user, setUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("chalakgo_user") || "null");
-    } catch {
-      return null;
-    }
-  });
-  const readToken = () => localStorage.getItem("chalakgo_user_token") || sessionStorage.getItem("chalakgo_user_token");
-  const [sessionToken, setSessionToken] = useState(readToken);
-  useEffect(() => {
-    const syncSession = () => {
-      const token = readToken();
-      setSessionToken(token);
-      try { setUser(token ? JSON.parse(localStorage.getItem("chalakgo_user") || "null") : null); }
-      catch { setUser(null); }
-    };
-    window.addEventListener(USER_SESSION_EVENT, syncSession);
-    window.addEventListener("storage", syncSession);
-    syncSession();
-    return () => {
-      window.removeEventListener(USER_SESSION_EVENT, syncSession);
-      window.removeEventListener("storage", syncSession);
-    };
-  }, []);
   const navbarPages = pages.filter(page => page.slug !== "terms-and-conditions");
-  const [userMenu, setUserMenu] = useState(false);
 
   // Published admin services are the source of truth for this menu.
   useLiveEffect(() => {
@@ -87,68 +59,15 @@ export default function Navbar() {
       .catch(() => {});
   }, []);
   useEffect(() => {
-    const token = sessionToken;
-    const controller = new AbortController();
-    // Guests do not have a session, so do not make an unnecessary /me request.
-    if (!token) return;
-    const expiryDelay = tokenExpiryDelay(token);
-    if (!expiryDelay) {
-      clearUserSession();
-      setUser(null);
-      return;
-    }
-    const expiryTimer = window.setTimeout(() => {
-      clearUserSession();
-      setUser(null);
-      window.location.href = "/login";
-    }, expiryDelay);
-    fetch(`${API_BASE}/api/users/me`, {
-      signal: controller.signal,
-      credentials: "include",
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((response) => {
-        if (response.ok) return response.json();
-        if (response.status === 401 || response.status === 403) return null;
-        throw new Error("Session check unavailable");
-      })
-      .then((data) => {
-        if (controller.signal.aborted || readToken() !== token) return;
-        if (data?.user) {
-          setUser(data.user);
-          localStorage.setItem("chalakgo_user", JSON.stringify(data.user));
-          return;
-        }
-        clearUserSession();
-        setUser(null);
-      })
-      .catch(() => {});
-    return () => { controller.abort(); window.clearTimeout(expiryTimer); };
-  }, [sessionToken]);
-  useEffect(() => {
     document.body.classList.toggle("mobile-nav-open", open);
     return () => document.body.classList.remove("mobile-nav-open");
   }, [open]);
 
   const close = () => {
     setOpen(false);
-    setUserMenu(false);
-  };
-  const logout = async () => {
-    try {
-      await fetch(`${API_BASE}/api/users/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } finally {
-      clearUserSession();
-      setUser(null);
-      toast.success("You have been logged out.");
-      close();
-    }
   };
   const serviceLinks = (className) =>
-    services.map((service) => (
+    [...services].sort((a, b) => Number(b.slug === "driver-only") - Number(a.slug === "driver-only")).map((service) => (
       <Link
         key={service.slug}
         to={servicePath(service.slug)}
@@ -226,50 +145,6 @@ export default function Navbar() {
           >
             Book Now
           </Link>
-          {user ? (
-            <div className="relative">
-              <button
-                type="button"
-                aria-expanded={userMenu}
-                onClick={() => setUserMenu((value) => !value)}
-                className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-3 text-sm font-bold text-slate-700"
-              >
-                <UserRound size={16} />
-                {user.fullName?.split(" ")[0] || "Account"}
-                <ChevronDown
-                  size={15}
-                  className={userMenu ? "rotate-180 transition" : "transition"}
-                />
-              </button>
-              {userMenu && (
-                <div className="absolute right-0 top-[calc(100%+8px)] z-[120] w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-                  <div className="border-b border-slate-100 px-3 py-3">
-                    <p className="font-bold text-[#10213f]">
-                      {user.fullName || "Customer"}
-                    </p>
-                    <p className="mt-1 truncate text-xs text-slate-500">
-                      {user.email || user.mobile}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={logout}
-                    className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-3 text-left text-sm font-bold text-red-600 hover:bg-red-50"
-                  >
-                    <LogOut size={16} />
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Link
-              to="/login"
-              className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold"
-            >
-              Login
-            </Link>
-          )}
         </div>
         <button
           type="button"
@@ -331,22 +206,6 @@ export default function Navbar() {
                 {page.navigationLabel || page.title}
               </Link>
             ))}
-            {user && (
-              <div className="rounded-xl bg-slate-50 px-4 py-3">
-                <p className="font-bold">{user.fullName || "Customer"}</p>
-                <p className="mt-1 text-xs text-slate-500">
-                  {user.email || user.mobile}
-                </p>
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="mt-3 flex items-center gap-2 font-bold text-red-600"
-                >
-                  <LogOut size={16} />
-                  Logout
-                </button>
-              </div>
-            )}
           </div>
           <div className="mobile-drawer-actions">
             <Link
@@ -356,15 +215,6 @@ export default function Navbar() {
             >
               Book Now
             </Link>
-            {!user && (
-              <Link
-                to="/login"
-                onClick={close}
-                className="rounded-xl border border-slate-300 bg-white text-center font-bold"
-              >
-                Login
-              </Link>
-            )}
           </div>
         </div>
       )}

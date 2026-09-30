@@ -10,7 +10,7 @@ const Faqs = lazy(() => import("./components/Faqs.jsx"));
 const Fleet = lazy(() => import("./components/Fleet.jsx"));
 import Home from "./components/Home";
 const HowItWorks = lazy(() => import("./components/HowItWorks.jsx"));
-const Login = lazy(() => import("./components/Login.jsx"));
+
 const ManagedPage = lazy(() => import("./components/ManagedPage.jsx"));
 const Pricing = lazy(() => import("./components/Pricing.jsx"));
 const Reviews = lazy(() => import("./components/Reviews.jsx"));
@@ -125,7 +125,8 @@ export default function App() {
       {editableRoute("/about", "about", About)}
       {editableRoute("/contact", "contact", Contact)}
       {editableRoute("/terms-and-conditions", "terms-and-conditions", Terms, { showFooterReviews: false })}
-      {publicRoute("/login", Login, { showFooterReviews: false })}
+      <Route path="/login" element={<Navigate replace to="/services" />} />
+      <Route path="/signup" element={<Navigate replace to="/services" />} />
       {editableRoute("/pricing", "pricing", Pricing)}
       {editableRoute("/services", "services", Services)}
       {publicRoute("/chauffeur-service-jaipur", Services)}

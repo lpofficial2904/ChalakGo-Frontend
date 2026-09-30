@@ -1,28 +1,30 @@
-.home-service-grid { align-items: stretch; }
+.home-service-grid { align-items: stretch; gap: 20px; }
 .home-service-card {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  padding: 10px;
-  border: 1px solid #e0e7f1;
-  border-radius: 28px;
-  background: #fff;
-  box-shadow: 0 8px 28px #10213f08;
+  display: flex; flex-direction: column; min-width: 0; padding: 8px;
+  border: 1px solid #e1e7ef; border-radius: 20px; background: #fff;
+  color: #10213f; text-decoration: none;
+  box-shadow: 0 4px 20px #10213f05;
   transition: border-color .2s, box-shadow .2s;
 }
-.home-service-card:hover { border-color: #a7c8fa; box-shadow: 0 16px 36px #10213f12; }
-.home-service-media { overflow: hidden; border-radius: 20px; background: #f1f5f9; }
-.home-service-content { display: flex; flex: 1; flex-direction: column; align-items: flex-start; padding: 22px 14px 14px; overflow-wrap: anywhere; }
-.home-service-price { max-width: 100%; margin-bottom: 16px; padding: 7px 12px; border: 1px solid #dbeafe; border-radius: 9px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 700; line-height: 1.5; }
-.home-service-features { display: grid; gap: 9px; margin: 20px 0 0; color: #475569; font-size: 12px; line-height: 1.5; }
-.home-service-features span { display: flex; align-items: flex-start; gap: 8px; }
-.home-service-features svg { flex-shrink: 0; color: #2563eb; margin-top: 2px; }
-.home-service-button { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; margin-top: auto; padding: 13px 16px; border-radius: 12px; background: #0b2145; color: #fff; font-size: 14px; font-weight: 700; transition: background .2s; }
-
-
-
-.home-service-features { padding-bottom: 24px; }
-.home-service-content > p:not(.home-service-price) { margin-bottom: 20px; }
-.home-service-button:hover { background: #2563eb; }
-.home-service-button:focus-visible { outline: 3px solid #60a5fa; outline-offset: 4px; }
-@media (prefers-reduced-motion: reduce) { .home-service-card, .home-service-button { transition: none; } }
+.home-service-card:hover { border-color: #adc6ed; box-shadow: 0 12px 30px #10213f12; }
+.home-service-media { overflow: hidden; border-radius: 13px; background: linear-gradient(135deg, #edf3fb, #f7f9fc); }
+.home-service-image { display: block; width: 100%; height: clamp(200px, 19vw, 250px); object-fit: contain; }
+.home-service-content { display: flex; flex: 1; flex-direction: column; align-items: flex-start; padding: 16px 14px 10px; overflow-wrap: anywhere; }
+.home-service-price { max-width: 100%; margin: 0 0 10px; padding: 5px 9px; border: 1px solid #e0eafa; border-radius: 6px; background: #f4f8ff; color: #2455a4; font-size: 11px; font-weight: 600; line-height: 1.4; }
+.home-service-title { margin: 0; font-size: 20px; font-weight: 750; line-height: 1.3; letter-spacing: -.025em; }
+.home-service-description { margin: 8px 0 0; color: #64748b; font-size: 12px; line-height: 1.7; }
+.home-service-features { display: grid; gap: 6px; margin: 14px 0 16px; color: #52637a; font-size: 11px; line-height: 1.5; }
+.home-service-features span { display: flex; align-items: flex-start; gap: 7px; }
+.home-service-features svg { flex-shrink: 0; width: 13px; height: 13px; color: #3b73c7; margin-top: 2px; }
+.home-service-button { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 44px; margin-top: auto; padding: 11px 0 2px; border-top: 1px solid #e9eef5; color: #123563; font-size: 12px; font-weight: 700; transition: color .2s; }
+.home-service-button svg { box-sizing: content-box; padding: 7px; border: 1px solid #e5ecf5; border-radius: 50%; background: #f6f9fd; transition: background .2s, color .2s; }
+.home-service-card:hover .home-service-button, .home-service-card:focus-visible .home-service-button { color: #2563eb; }
+.home-service-card:hover .home-service-button svg { background: #2563eb; color: #fff; border-color: #2563eb; }
+.home-service-card:focus-visible { outline: 3px solid #60a5fa; outline-offset: 4px; }
+@media (max-width: 639px) {
+  .home-service-grid { gap: 16px; }
+  .home-service-image { height: 210px; }
+  .home-service-content { padding: 14px 12px 8px; }
+  .home-service-title { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) { .home-service-card, .home-service-button, .home-service-button svg { transition: none; } }

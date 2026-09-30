@@ -18,7 +18,7 @@ export const serviceSeoPages = {
     sections: [
       ["A private chauffeur for your Jaipur journey", "Choose the car-and-driver service when you want to travel in a private vehicle without driving yourself. The existing service offers vehicle choices including executive sedan and SUV options; confirm the available vehicle and journey details while booking."],
       ["Airport transfers, business travel and sightseeing", "Request a chauffeur-driven car for an airport transfer, a work journey or a sightseeing day. Share your pickup details and timing in the booking form so the team can follow up about your request."],
-      ["How to request a chauffeur", "Select this service, choose the available vehicle and enter your journey and pickup details. Review the estimate shown for your selection, sign in if prompted, and submit the booking request for follow-up."],
+      ["How to request a chauffeur", "Select this service, choose the available vehicle and enter your journey and pickup details. Review the estimate shown for your selection and submit the booking request for follow-up."],
     ],
     faqs: [
       ["What is a chauffeur service in Jaipur?", "It is a private car booking that includes a professional driver for your requested journey."],
@@ -60,7 +60,7 @@ export const serviceSeoPages = {
     sections: [
       ["A driver for your own car", "With driver-only booking, you provide the vehicle and request a professional driver to drive it. The service lists hourly, daily and weekly options; current availability and plan details appear in the booking flow."],
       ["Temporary and full-day driver requests", "Choose a plan that fits the duration you need, then enter your pickup location, date and timing. Longer or outstation requests should be confirmed with the team before travel."],
-      ["How to book a driver", "Select Driver Only, choose an available plan, enter your pickup and schedule details, then submit the request. Sign in if prompted to complete the booking request."],
+      ["How to book a driver", "Select Driver Only, choose an available plan, enter your pickup and schedule details, then submit the booking request."],
     ],
     faqs: [
       ["Can I hire a driver for my own car?", "Yes. Driver Only is the service for requesting a driver to drive your own vehicle."],
@@ -125,7 +125,7 @@ const pages = {
   "/reviews": ["Customer Reviews", "Read customer experiences and reviews of ChalakGo driver services."],
   "/faqs": ["Frequently Asked Questions", "Find answers about ChalakGo driver bookings, pricing, services and travel."],
   "/terms-and-conditions": ["Terms & Conditions", "Read the terms for ChalakGo driver hiring, cab bookings, service fees and replacement support."],
-  "/login": ["Customer Login", "Log in to ChalakGo to book a driver and manage your bookings."],
+  "/login": ["Customer Login", "Customer account access for ChalakGo."],
 };
 
 // One Helmet instance prevents competing metadata tags in React 19.

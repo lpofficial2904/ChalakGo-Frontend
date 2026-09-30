@@ -19,6 +19,8 @@ import { Link } from "react-router-dom";
 import { API_BASE } from "../utils/api.js";
 import { servicePath } from "../utils/serviceRoutes.js";
 
+const ServiceCardLink = motion.create(Link);
+
 const fallbackServices = [
   {
     slug: "driver-only",
@@ -228,35 +230,34 @@ function ServicesPreview({ services }) {
         </motion.div>
         <div className="home-service-grid mt-10 grid gap-6 lg:grid-cols-3">
           {services.slice(0, 3).map((service, index) => (
-            <motion.article
+            <ServiceCardLink
               {...reveal}
               transition={{ delay: index * 0.1 }}
               key={service.slug}
+              to={servicePath(service.slug)}
+              aria-label={`View ${service.name} details`}
               className="home-service-card group"
             >
               <div className="home-service-media">
                 <SiteImage sizes="(max-width: 1023px) 100vw, (max-width: 1440px) 33vw, 410px" src={assetUrl(service.image)}
                   alt={service.name}
-                  className="block aspect-square w-full bg-slate-100 object-contain"
+                  className="home-service-image"
                 />
               </div>
               <div className="home-service-content">
                 <p className="home-service-price">{servicePriceLabel(service)}</p>
-                <h3 className="text-2xl font-extrabold">{service.name}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-500">
+                <h3 className="home-service-title">{service.name}</h3>
+                <p className="home-service-description">
                   {service.detail}
                 </p>
                 {service.features?.length > 0 && <div className="home-service-features">
                   {service.features.slice(0, 2).map(feature => <span key={feature}><CheckCircle2 size={15} aria-hidden="true" />{feature}</span>)}
                 </div>}
-                <Link
-                  to={servicePath(service.slug)}
-                  className="home-service-button"
-                ><PageText id="text_12">
+                <span className="home-service-button"><PageText id="text_12">
                   View details </PageText><ArrowRight size={17} />
-                </Link>
+                </span>
               </div>
-            </motion.article>
+            </ServiceCardLink>
           ))}
         </div>
         <nav aria-label="ChalakGo services" className="mt-10 flex flex-wrap gap-3">

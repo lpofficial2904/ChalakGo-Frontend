@@ -1,5 +1,5 @@
 import SiteImage from "./SiteImage.jsx";
-import { MapPin, LocateFixed, PencilLine, CheckCircle2, RefreshCw, ArrowRight, LoaderCircle } from "lucide-react";
+import { MapPin, LocateFixed, PencilLine, CheckCircle2, ArrowRight, LoaderCircle } from "lucide-react";
 import "./Services.css";
 import ServiceFareEstimate from "./ServiceFareEstimate.jsx";
 import DriverFareEstimate from "./DriverFareEstimate.jsx";
@@ -16,7 +16,6 @@ import { assetUrl } from "../utils/assets.js";
 import CabPlans from "./CabPlans.jsx";
 import {
   readBookingDraft,
-  saveBookingDraft,
   clearBookingDraft,
 } from "../utils/bookingDraft.js";
 import { useEffect, useRef, useState } from "react";
@@ -24,7 +23,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import useCurrentLocation from "./usePickupCoordinates";
 import { API_BASE } from "../utils/api.js";
-import { bookingConfirmation } from "../utils/bookingConfirmation.js";
+import { showBookingSuccess } from "./BookingSuccess.jsx";
 import { toast } from "sonner";
 import {
   addressFields,
@@ -55,14 +54,6 @@ const pickupPayload = (form, source, coordinates, timestamp) => {
     // GPS-coordinate address in every required pickup field in that case.
     ...buildPickupPayload({ ...form, address: form.address || address }, source, coordinates, timestamp),
   };
-};
-
-const signedInUser = () => {
-  try {
-    return JSON.parse(localStorage.getItem("chalakgo_user") || "null") || {};
-  } catch {
-    return {};
-  }
 };
 
 const defaultServices = [
@@ -214,6 +205,8 @@ function ServiceNotFound() {
 }
 
 function ServiceList({ services }) {
+  const navigate = useNavigate();
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#f6f9ff] px-5 py-12 text-[#10213f] sm:py-16">
       <section className="mx-auto max-w-6xl">
@@ -244,7 +237,7 @@ function ServiceList({ services }) {
           </div>
         </motion.div>
         <div className="mx-auto -mt-5 grid max-w-[1120px] gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {services.map((item, index) => (
+          {[...services].sort((a, b) => Number(b.slug === "driver-only") - Number(a.slug === "driver-only")).map((item, index) => (
             <motion.article
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -252,7 +245,17 @@ function ServiceList({ services }) {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               key={item.slug}
-              className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_14px_40px_rgba(25,54,96,.10)]"
+              className="group cursor-pointer overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_14px_40px_rgba(25,54,96,.10)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300"
+              role="link"
+              tabIndex={0}
+              aria-label={`Explore ${item.name} service`}
+              onClick={() => navigate(servicePath(item.slug))}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  navigate(servicePath(item.slug));
+                }
+              }}
             >
               <div className="relative">
                 <SiteImage
@@ -289,7 +292,8 @@ function ServiceList({ services }) {
                 </div>
                 <Link
                   to={servicePath(item.slug)}
-                  className="mt-auto pt-6 text-sm font-extrabold text-blue-600 transition group-hover:text-blue-800"
+                  onClick={(event) => event.stopPropagation()}
+                  className="mt-auto inline-flex w-fit items-center gap-2 rounded-full bg-blue-600 px-4 py-2.5 pt-2.5 text-sm font-extrabold text-white shadow-md shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
                 >
                   Explore service &amp; book →
                 </Link>
@@ -339,8 +343,8 @@ function ServiceDetails({ service, pageConfig }) {
             ) : null}
           </div>
         </div>
-        {pageConfig && <ServiceSeoContent pageConfig={pageConfig} />}
         <BookingForm service={service} />
+        {pageConfig && <ServiceSeoContent pageConfig={pageConfig} />}
       </section>
     </main>
   );
@@ -381,6 +385,8 @@ function JaipurTour({ service, pageConfig }) {
     const index = plans.findIndex((plan) => plan.days === days);
     return index < 0 ? null : index;
   });
+  const [collapsed, setCollapsed] = useState(selected !== null);
+  const [showDetails, setShowDetails] = useState(false);
   const active = selected === null ? null : plans[selected];
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,_#dbeafe,_transparent_32rem),#f7f9fc] px-5 py-10 text-[#101a31] sm:py-14">
@@ -418,23 +424,15 @@ function JaipurTour({ service, pageConfig }) {
             <p className="text-sm font-extrabold tracking-[.16em] text-blue-600">{content.plansEyebrow}</p>
             <h2 className="mt-2 text-3xl font-extrabold">{content.plansTitle}</h2>
           </div>
+          {collapsed && <button type="button" onClick={() => { setCollapsed(false); setSelected(null); setShowDetails(false); }} className="text-sm font-bold text-blue-700">Change plan</button>}
           <p className="max-w-sm text-sm leading-6 text-slate-500">{content.plansDescription}</p>
         </div>
         <div className="mt-7 grid gap-6 md:grid-cols-2">
           {plans.map((plan, index) => (
-            <button
+            <article
               key={plan.days}
-              type="button"
-              onClick={() => setSelected(index)}
-              className={`group relative overflow-hidden rounded-3xl border bg-white p-7 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${selected === index ? "border-blue-600 ring-4 ring-blue-100" : "border-slate-200 hover:border-blue-400"}`}
+              className={`${selected === index || !collapsed ? "block" : "hidden sm:block"} group relative overflow-hidden rounded-3xl border bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl sm:p-7 ${selected === index ? "border-blue-600 ring-4 ring-blue-100" : "border-slate-200 hover:border-blue-400"}`}
             >
-              {plan.image && (
-                <SiteImage
-                  src={assetUrl(plan.image)}
-                  alt={plan.title || `${plan.days}-day Jaipur Tour`}
-                  className="mb-6 h-56 w-full rounded-2xl bg-slate-100 object-contain"
-                />
-              )}
               <div className="flex items-center justify-between"><p className="font-bold text-blue-600">JAIPUR SIGHTSEEING</p><span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700">{plan.days} DAY</span></div>
               <h2 className="mt-2 text-3xl font-extrabold">
                 {plan.title || `${plan.days} Day Tour`}
@@ -448,13 +446,14 @@ function JaipurTour({ service, pageConfig }) {
               <p className="mt-4 text-sm text-slate-600">
                 {plan.places?.length || 0} places included
               </p>
-              <span className="mt-7 inline-block font-bold text-blue-600">
-                View places &amp; full details →
-              </span>
-            </button>
+              <div className="mt-5 flex flex-wrap gap-2 sm:mt-7">
+                <button type="button" onClick={() => { setSelected(index); setCollapsed(true); setShowDetails(false); }} className={`rounded-full px-4 py-2 text-sm font-bold ${selected === index ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-700 hover:bg-blue-100"}`}>{selected === index ? "Selected" : "Select plan"}</button>
+                <button type="button" onClick={() => { setSelected(index); setCollapsed(true); setShowDetails(true); }} className="rounded-full border border-blue-200 px-4 py-2 text-sm font-bold text-blue-700 hover:bg-blue-50">View more</button>
+              </div>
+            </article>
           ))}
         </div>
-        {active && (
+        {active && showDetails && (
           <section className="mt-8 rounded-3xl border border-blue-100 bg-white p-7 shadow-sm sm:p-10">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -467,7 +466,7 @@ function JaipurTour({ service, pageConfig }) {
               </div>
               <button
                 type="button"
-                onClick={() => setSelected(null)}
+                onClick={() => setShowDetails(false)}
                 className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-bold"
               >
                 Close
@@ -502,9 +501,9 @@ function JaipurTour({ service, pageConfig }) {
             </p>
           </section>
         )}
+        <TourBookingForm service={service} plan={active} />
         <AdditionalContent service={service} />
         {pageConfig && <ServiceSeoContent pageConfig={pageConfig} />}
-        <TourBookingForm service={service} plan={active} />
       </section>
     </main>
   );
@@ -562,27 +561,16 @@ function TourBookingForm({ service, plan }) {
     return () => clearTimeout(timer);
   }, [hash]);
   const draft = useRef(readBookingDraft(service.slug)).current;
-  const navigate = useNavigate();
-  const { coordinates, timestamp, loading, error, label, fetchLocation } =
+  const { coordinates, timestamp, loading, error, fetchLocation } =
     useCurrentLocation(draft);
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
-    email: "",
     address: "",
     city: "",
     state: "",
     ...draft?.form,
   });
-  useEffect(() => {
-    const user = signedInUser();
-    setForm((old) => ({
-      ...old,
-      fullName: old.fullName || user.fullName || "",
-      phone: old.phone || user.mobile || "",
-      email: old.email || user.email || "",
-    }));
-  }, []);
   const [locationMode, setLocationMode] = useState(
     draft?.locationMode || "manual",
   );
@@ -614,38 +602,19 @@ function TourBookingForm({ service, plan }) {
     if (!/^[6-9][0-9]{9}$/.test(form.phone))
       return setStatus("Enter a valid 10-digit Indian mobile number.");
     if (locationMode === "current" && !coordinates)
-      return setStatus("Detect and confirm your pickup location first.");
-    if (
-      !localStorage.getItem("chalakgo_user_token") &&
-      !sessionStorage.getItem("chalakgo_user_token")
-    ) {
-      saveBookingDraft({
-        slug: service.slug,
-        form,
-        locationMode,
-        coordinates,
-        timestamp,
-        planDays: plan?.days,
-      });
-      return navigate("/login", {
-        state: { returnTo: `${servicePath(service.slug)}#booking` },
-      });
-    }
+      return setStatus("Fetch your current pickup location first.");
     setSaving(true);
     setStatus("");
     try {
-      const token =
-        localStorage.getItem("chalakgo_user_token") ||
-        sessionStorage.getItem("chalakgo_user_token");
+
       const response = await fetch(`${API_BASE}/api/bookings`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        credentials: "omit",
+        headers: { "Content-Type": "application/json" },
+
         body: JSON.stringify({
           ...form,
+          email: undefined,
           service: service.name,
           carType: "Tour vehicle",
           duration: `${plan.days} day tour`,
@@ -657,9 +626,7 @@ function TourBookingForm({ service, plan }) {
       const data = await response.json();
       if (!response.ok) throw Error(data.message || data.error);
       clearBookingDraft();
-      toast.success("Jaipur Tour booking request saved.", {
-        description: `Plan: ${plan.days} day tour · ${plan.price}`,
-      });
+      showBookingSuccess(data.booking, service.name);
       setStatus(
         `Booking ID: ${data.booking?.bookingId || "Saved successfully"}`,
       );
@@ -708,17 +675,6 @@ function TourBookingForm({ service, plan }) {
             maxLength="10"
           />
         </label>
-        <label className="text-sm font-bold">
-          Email address
-          <input
-            className="input"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={update}
-            required
-          />
-        </label>
         {locationMode === "manual" &&
           manualFields.map(([title, name]) => (
             <label key={name} className="text-sm font-bold">
@@ -741,33 +697,23 @@ function TourBookingForm({ service, plan }) {
           ))}
       </div>
       <div className="mt-5"><ServiceFareEstimate kind="fixed" selected={plan.title || `${plan.days}-day Jaipur Tour`} days={plan.days} fare={tourFare} error={tourFareError} /></div>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={useCurrent}
-          disabled={loading}
-          className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white"
-        >
-          {loading ? "Detecting..." : "Use current location"}
-        </button>
-        <span className="text-sm text-slate-500">
-          {locationMode === "current"
-            ? error || label
-            : "Enter pickup address manually"}
-        </span>
-      </div>
-      <button
-        type="button"
-        onClick={() => setLocationMode("manual")}
-        className="mt-3 text-sm font-bold text-blue-600"
-      >
-        Enter manually
-      </button>
-      {locationMode === "current" && coordinates && !loading && (
-        <p className="mt-4 text-sm">
-          Latitude: {coordinates.latitude} | Longitude: {coordinates.longitude}
+      <div className="pickup-panel mt-5">
+        <div className="flex items-center gap-3">
+          <span className="pickup-icon"><MapPin size={21} aria-hidden="true" /></span>
+          <div><h3 className="font-extrabold">Pickup location</h3><p className="mt-1 text-sm text-slate-500">Choose GPS or enter an address.</p></div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3">
+          <button type="button" aria-pressed={locationMode === "current"} onClick={useCurrent} disabled={loading} className={`pickup-mode ${locationMode === "current" ? "pickup-mode-active" : ""}`}>
+            <LocateFixed size={18} aria-hidden="true" />{loading ? "Detecting..." : "Use current location"}
+          </button>
+          <button type="button" aria-pressed={locationMode === "manual"} onClick={() => setLocationMode("manual")} className={`pickup-mode ${locationMode === "manual" ? "pickup-mode-active" : ""}`}>
+            <PencilLine size={17} aria-hidden="true" />Enter manually
+          </button>
+        </div>
+        <p role="status" aria-live="polite" className="mt-3 text-sm text-slate-600">
+          {locationMode === "current" ? loading ? "Finding your pickup point" : error || (coordinates ? "Location set. Tap above to refresh." : "Tap above to detect your location.") : "Enter your pickup address in the form."}
         </p>
-      )}
+      </div>
       <button
         disabled={saving || loading}
         className="mt-7 w-full rounded-xl bg-blue-600 py-4 font-bold text-white disabled:opacity-60"
@@ -783,7 +729,8 @@ function TourBookingForm({ service, plan }) {
   );
 }
 
-function PermanentInfo({ service, selected, onSelect }) {
+function PermanentInfo({ service, selected, onSelect, plansOnly = false, extrasOnly = false }) {
+  const [collapsed, setCollapsed] = useState(false);
   const content = contentOf(service);
   const monthlyRates = {
     sixToEight: 15000,
@@ -809,8 +756,8 @@ function PermanentInfo({ service, selected, onSelect }) {
     ],
   ];
   return (
-    <section className="mt-10 space-y-10">
-      <div>
+    <section className="mt-8 space-y-6">
+      {(!plansOnly || extrasOnly) && <div>
         <p className="font-bold text-blue-600">{content.sectionEyebrow}</p>
         <h2 className="mt-2 text-3xl font-extrabold">
           {content.sectionTitle}
@@ -818,8 +765,8 @@ function PermanentInfo({ service, selected, onSelect }) {
         <p className="mt-3 max-w-4xl leading-7 text-slate-600">
           {content.sectionDescription}
         </p>
-      </div>
-      <div>
+      </div>}
+      {(!plansOnly || extrasOnly) && <div>
         <h2 className="text-2xl font-extrabold">{content.benefitsTitle}</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {(content.benefits || '').split('\n').filter(Boolean).map(line => { const [title, ...body] = line.split('|'); return [title, body.join('|')]; }).map(([title, body]) => (
@@ -832,14 +779,14 @@ function PermanentInfo({ service, selected, onSelect }) {
             </div>
           ))}
         </div>
-      </div>
-      <div>
-        <h2 className="text-2xl font-extrabold">{content.plansTitle}</h2>
-        <div className="mt-4 grid gap-5 lg:grid-cols-3">
+      </div>}
+      {!extrasOnly && <div>
+        <div className="flex items-center justify-between gap-3"><h2 className="text-2xl font-extrabold">{content.plansTitle}</h2>{collapsed && <button type="button" onClick={() => setCollapsed(false)} className="text-sm font-bold text-blue-700">Change plan</button>}</div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
           {plans.map(([timing, leave, salary]) => (
             <article
               key={timing}
-              className={`rounded-2xl border p-6 shadow-sm ${selected === timing ? "border-blue-600 bg-blue-50 ring-2 ring-blue-600" : "border-slate-200 bg-white"}`}
+              className={`${selected === timing || !collapsed ? "block" : "hidden sm:block"} rounded-2xl border p-4 shadow-sm sm:p-6 ${selected === timing ? "border-blue-600 bg-blue-50 ring-2 ring-blue-600" : "border-slate-200 bg-white"}`}
             >
               <h3 className="text-xl font-extrabold">{timing}</h3>
               <p className="mt-4 text-sm text-slate-600">
@@ -852,7 +799,7 @@ function PermanentInfo({ service, selected, onSelect }) {
                 type="button"
                 aria-label={`Select ${timing}`}
                 aria-pressed={selected === timing}
-                onClick={() => onSelect(timing)}
+                onClick={() => { onSelect(timing); setCollapsed(true); }}
                 className={`mt-5 w-full rounded-lg px-4 py-2.5 text-sm font-semibold ${selected === timing ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-800 hover:bg-blue-100"}`}
               >
                 {selected === timing ? "Selected ✓" : "Select Plan →"}
@@ -860,8 +807,8 @@ function PermanentInfo({ service, selected, onSelect }) {
             </article>
           ))}
         </div>
-      </div>
-      <div className="rounded-2xl border border-blue-100 bg-blue-50 p-6">
+      </div>}
+      {(!plansOnly || extrasOnly) && <div className="rounded-2xl border border-blue-100 bg-blue-50 p-6">
         <h2 className="text-2xl font-extrabold">
           {content.otherTitle}
         </h2>
@@ -870,7 +817,7 @@ function PermanentInfo({ service, selected, onSelect }) {
             <span key={item}>• {item}</span>
           ))}
         </div>
-      </div>
+      </div>}
     </section>
   );
 }
@@ -887,13 +834,11 @@ function BookingForm({ service }) {
     return () => clearTimeout(timer);
   }, [hash]);
   const draft = useRef(readBookingDraft(service.slug)).current;
-  const navigate = useNavigate();
   const {
     coordinates,
     timestamp,
     loading,
     error,
-    label,
     acquisitionStatus,
     fetchLocation,
     fetchInitialLocation,
@@ -921,9 +866,6 @@ function BookingForm({ service }) {
   const [locationMode, setLocationMode] = useState(
     draft?.locationMode || "current",
   );
-  const [confirmedPickup, setConfirmedPickup] = useState(
-    draft?.confirmedPickup || null,
-  );
   const manualAddress = useRef(addressFormValues(null));
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -931,7 +873,6 @@ function BookingForm({ service }) {
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
-    email: "",
     address: "",
     area: "",
     pincode: "",
@@ -949,15 +890,6 @@ function BookingForm({ service }) {
     endTime: "",
     ...draft?.form,
   });
-  useEffect(() => {
-    const user = signedInUser();
-    setForm((old) => ({
-      ...old,
-      fullName: old.fullName || user.fullName || "",
-      phone: old.phone || user.mobile || "",
-      email: old.email || user.email || "",
-    }));
-  }, []);
 
   useEffect(() => {
     if (draft) return;
@@ -1038,32 +970,16 @@ function BookingForm({ service }) {
       return setStatus("Please wait for location detection to finish.");
     if ((temporary || distanceBased || monthlyBased) && !fare)
       return setStatus(fareError);
-    if (
-      !localStorage.getItem("chalakgo_user_token") &&
-      !sessionStorage.getItem("chalakgo_user_token")
-    ) {
-      saveBookingDraft({
-        slug: service.slug,
-        form,
-        locationMode,
-        coordinates,
-        timestamp,
-        confirmedPickup,
-      });
-      return navigate("/login", {
-        state: { returnTo: `${servicePath(service.slug)}#booking` },
-      });
-    }
     if (!/^[6-9][0-9]{9}$/.test(form.phone))
       return setStatus("Enter a valid 10-digit Indian mobile number.");
 
     const pickupCoordinates =
       locationMode === "current"
-        ? confirmedPickup?.coordinates || coordinates
+        ? coordinates
         : undefined;
     const pickupTimestamp =
       locationMode === "current"
-        ? confirmedPickup?.timestamp || timestamp
+        ? timestamp
         : undefined;
 
     if (
@@ -1073,14 +989,13 @@ function BookingForm({ service }) {
         !Number.isFinite(pickupCoordinates.longitude))
     ) {
       return setStatus(
-        "Detect and confirm your current pickup location before submitting.",
+        "Fetch your current pickup location before submitting.",
       );
     }
-    if (locationMode === "current" && !confirmedPickup)
-      return setStatus("Confirm your pickup coordinates before submitting.");
 
     const payload = {
       ...form,
+      email: undefined,
       service: service.name,
       ...(temporary || distanceBased || monthlyBased
         ? {
@@ -1102,16 +1017,12 @@ function BookingForm({ service }) {
     setStatus("");
     const toastId = toast.loading("Saving your booking...");
     try {
-      const token =
-        localStorage.getItem("chalakgo_user_token") ||
-        sessionStorage.getItem("chalakgo_user_token");
+
       const response = await fetch(`${API_BASE}/api/bookings`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        credentials: "omit",
+        headers: { "Content-Type": "application/json" },
+
         body: JSON.stringify(payload),
       });
       const data = await response.json();
@@ -1119,16 +1030,8 @@ function BookingForm({ service }) {
         throw new Error(
           data.error ? `${data.message}: ${data.error}` : data.message,
         );
-      const message = bookingConfirmation(
-        { booking: { ...data.booking, bookingId: undefined } },
-        temporary || distanceBased || monthlyBased,
-      ).replace("Booking request saved successfully. ", "");
       clearBookingDraft();
-      toast.success("Booking request saved successfully.", {
-        id: toastId,
-        description: message,
-        duration: 8000,
-      });
+      showBookingSuccess(data.booking, service.name, toastId);
       setStatus(
         data.booking?.bookingId
           ? `Booking ID: ${data.booking.bookingId}`
@@ -1167,25 +1070,12 @@ function BookingForm({ service }) {
       }));
     }
     setLocationMode(mode);
-    setConfirmedPickup(null);
     setStatus("");
     if (mode !== "current") return;
     const result = await fetchLocation();
     if (request !== locationRequest.current) return;
     if (result.coordinates)
       setForm((old) => ({ ...old, ...addressFormValues(result.details) }));
-  };
-
-  const confirmPickup = () => {
-    if (!coordinates) return setStatus("Detect your current location first.");
-    if (!Number.isFinite(coordinates.accuracy))
-      return setStatus(
-        "The GPS reading is incomplete. Please refresh your current location.",
-      );
-    setConfirmedPickup({ coordinates, timestamp: timestamp || Date.now() });
-    setStatus(
-      "Pickup location confirmed. Your detected coordinates will be used for the booking.",
-    );
   };
 
   const showAddressForm = locationMode === "manual";
@@ -1222,10 +1112,9 @@ function BookingForm({ service }) {
   ) : temporary && <ServiceFareEstimate kind="hourly" selected={service.name} fare={fare} error={fareError} />;
   return (
     <>
-    {permanent && <PermanentInfo service={service} selected={form.duration} onSelect={(duration) => setForm((old) => ({ ...old, duration }))} />}
-    <AdditionalContent service={service} />
     {driverOnly && <DriverPlans pricing={pricing} selected={form.driverPackage} onSelect={(driverPackage) => setForm((old) => ({ ...old, driverPackage }))} />}
     {distanceBased && <CabPlans service={service} selected={form.carType} onSelect={(carType) => setForm((old) => ({ ...old, carType }))} />}
+    {permanent && <PermanentInfo service={service} selected={form.duration} onSelect={(duration) => setForm((old) => ({ ...old, duration }))} plansOnly />}
     <motion.form
       id="booking"
       initial={{ opacity: 0, y: 25 }}
@@ -1251,8 +1140,7 @@ function BookingForm({ service }) {
           inputMode: "numeric",
           maxLength: 10,
         })}
-        {field("Email address", "email", "email", { required: true })}
-        <label className="text-sm font-bold">
+        {!driverOnly && !permanent && <label className="text-sm font-bold">
           Car type
           <select
             className="input"
@@ -1264,8 +1152,8 @@ function BookingForm({ service }) {
               <option key={type}>{type}</option>
             ))}
           </select>
-        </label>
-        {permanent ? (
+        </label>}
+        {distanceBased || permanent ? null : permanent ? (
           <label className="text-sm font-bold">
             Daily working hours
             <select
@@ -1303,15 +1191,14 @@ function BookingForm({ service }) {
             </select>
           </label>
         )}
-        {driverOnly && <DriverPlans compact pricing={pricing} selected={form.driverPackage} onSelect={(driverPackage) => setForm((old) => ({ ...old, driverPackage }))} />}
         {schedules}
         {temporaryEstimate}
         <div className="pickup-panel sm:col-span-2">
           <div className="flex items-center gap-3">
             <span className="pickup-icon"><MapPin size={23} aria-hidden="true" /></span>
-            <div><h3 className="text-lg font-extrabold">Where should we pick you up?</h3><p className="mt-1 text-sm text-slate-500">Use your location or add your pickup address.</p></div>
+            <div><h3 className="text-base font-extrabold">Pickup location</h3><p className="mt-0.5 text-xs text-slate-500">GPS or a manual address</p></div>
           </div>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3">
             <button
               type="button"
               aria-pressed={locationMode === "current"}
@@ -1332,47 +1219,7 @@ function BookingForm({ service }) {
               Enter manually
             </button>
           </div>
-          {locationMode === "current" && (
-            <div className={`pickup-result ${confirmedPickup && !loading && !error ? "pickup-result-confirmed" : ""}`}>
-              <div className="flex items-center gap-2 font-bold" role="status">
-                {loading ? <LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> : confirmedPickup && !error ? <CheckCircle2 size={19} aria-hidden="true" /> : <MapPin size={19} aria-hidden="true" />}
-                {loading ? "Finding your pickup point" : error ? "Location needs your attention" : confirmedPickup ? "Pickup location confirmed" : coordinates ? "Your pickup point is ready" : "Find your pickup point"}
-              </div>
-              <p className="mt-2 text-sm text-slate-600" aria-live="polite">
-                {loading ? acquisitionStatus : error || label}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={() => chooseMode("current")}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-blue-400 disabled:opacity-60"
-                >
-                  <RefreshCw size={15} className={loading ? "animate-spin" : ""} aria-hidden="true" />
-                  {loading ? "Fetching…" : "Refresh current location"}
-                </button>
-                <button
-                  type="button"
-                  disabled={loading || !coordinates}
-                  onClick={confirmPickup}
-                  className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition disabled:opacity-60 ${confirmedPickup ? "bg-emerald-600 hover:bg-emerald-700" : "bg-blue-600 hover:bg-blue-700"}`}
-                >
-                  <CheckCircle2 size={16} aria-hidden="true" />
-                  {confirmedPickup
-                    ? "Pickup location confirmed"
-                    : "Confirm pickup location"}
-                </button>
-              </div>
-              <details className="mt-4 text-xs text-slate-500">
-                <summary className="cursor-pointer font-medium">Location details</summary>
-              <p className="mt-2 break-all">
-                {coordinates
-                  ? `🌍 Latitude: ${coordinates.latitude} | Longitude: ${coordinates.longitude}`
-                  : "GPS coordinates will be captured after detection."}
-              </p>
-              </details>
-            </div>
-          )}
+          {locationMode === "current" && <p className="mt-3 text-xs text-slate-600" role="status" aria-live="polite">{loading ? acquisitionStatus : error || (coordinates ? "Location set. Tap above to refresh." : "Tap above to detect your location.")}</p>}
         </div>
         {showAddressForm && (
           <>
@@ -1411,6 +1258,8 @@ function BookingForm({ service }) {
         <p role="status" className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-center text-sm leading-6 text-slate-600">{status}</p>
       )}
     </motion.form>
+    {permanent && <PermanentInfo service={service} selected={form.duration} onSelect={() => {}} extrasOnly />}
+    <AdditionalContent service={service} />
     </>
   );
 }

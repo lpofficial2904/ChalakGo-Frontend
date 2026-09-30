@@ -62,7 +62,7 @@
 .pickup-mode-active { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; box-shadow: 0 0 0 1px #2563eb; }
 .pickup-mode:disabled { opacity: .6; cursor: wait; }
 .pickup-result { margin-top: 20px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; }
-.pickup-result-confirmed { border-color: #a7e3c5; background: #f0fdf7; color: #047857; }
+.pickup-result.pickup-result-confirmed { margin-top: 10px; padding: 4px 0 0; border: 0; border-top: 1px solid #e2e8f0; border-radius: 0; background: transparent; color: #047857; }
 .booking-submit {
   display: flex;
   justify-content: center;
@@ -81,3 +81,26 @@
 .booking-submit:hover { box-shadow: 0 10px 24px #2563eb40; }
 .booking-submit:disabled { opacity: .6; cursor: wait; }
 .pickup-panel button:focus-visible, .booking-submit:focus-visible { outline: 3px solid #60a5fa; outline-offset: 4px; }
+@media (max-width: 639px) {
+  .pickup-panel { padding: 14px; border-radius: 20px; }
+  .pickup-icon { width: 40px; height: 40px; border-radius: 13px; }
+  .pickup-mode { min-height: 46px; padding: 9px 6px; gap: 6px; font-size: 12px; }
+  .pickup-result { margin-top: 12px; padding: 14px; border-radius: 14px; }
+  .pickup-result button { min-width: 0; padding: 9px 6px; gap: 5px; font-size: 12px; }
+}
+
+/* Compact pickup controls retain explicit confirmation and location details. */
+.pickup-panel { padding: 16px; border-radius: 18px; }
+.pickup-icon { width: 36px; height: 36px; border-radius: 11px; }
+.pickup-mode { min-height: 44px; padding: 9px 8px; font-size: 12px; gap: 6px; }
+.pickup-result { margin-top: 12px; padding: 10px 12px; border-radius: 12px; }
+.pickup-status-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pickup-status-label { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; }
+.pickup-status-label svg { flex-shrink: 0; }
+.pickup-result .pickup-refresh { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; flex-shrink: 0; border-radius: 10px; background: #ffffffb3; color: #475569; cursor: pointer; }
+.pickup-refresh:disabled { opacity: .5; cursor: wait; }
+.pickup-result .pickup-confirm-action { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; margin-top: 10px; border-radius: 10px; background: #2563eb; color: #fff; font-size: 12px; font-weight: 700; }
+.pickup-confirm-action:disabled { opacity: .5; }
+.pickup-location-details { margin-top: 4px; color: #64748b; font-size: 11px; }
+.pickup-location-details summary { cursor: pointer; padding: 5px 0; }
+.pickup-location-details p { margin-top: 6px; overflow-wrap: anywhere; line-height: 1.6; }
