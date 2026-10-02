@@ -13,6 +13,7 @@ import { usePageSeo } from "./Seo.jsx";
 import { serviceSeoPages } from "./Seo.jsx";
 import { servicePath } from "../utils/serviceRoutes.js";
 import { assetUrl } from "../utils/assets.js";
+import { servicePriceLabel } from "../utils/servicePricing.js";
 import CabPlans from "./CabPlans.jsx";
 import {
   readBookingDraft,
@@ -264,11 +265,9 @@ function ServiceList({ services }) {
                   className="aspect-square w-full bg-slate-100 object-contain"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#071a37]/75 via-transparent to-transparent" />
-                {item.slug !== "car-driver" && (
-                  <p className="absolute bottom-4 left-5 rounded-full bg-white/95 px-3 py-1.5 text-sm font-extrabold text-blue-700">
-                    {item.price || "Custom pricing"}
-                  </p>
-                )}
+                <p className="absolute bottom-4 left-5 rounded-full bg-white/95 px-3 py-1.5 text-sm font-extrabold text-blue-700">
+                  {servicePriceLabel(item)}
+                </p>
               </div>
               <div className="flex min-h-[270px] flex-col p-7">
                 <p className="text-[11px] font-extrabold tracking-[.12em] text-blue-600">
@@ -338,8 +337,8 @@ function ServiceDetails({ service, pageConfig }) {
                 </li>
               ))}
             </ul>
-            {service.slug !== "car-driver" && (service.slug === "driver-only" || service.price) ? (
-              <p className="mt-8 text-3xl font-extrabold">{service.slug === "driver-only" ? `Plans from ₹${Math.min(...driverPricing(service.driverPricing).plans.map(plan => plan.price)).toLocaleString("en-IN")}` : service.price}</p>
+            {service.slug !== "car-driver" ? (
+              <p className="mt-8 text-3xl font-extrabold">{servicePriceLabel(service)}</p>
             ) : null}
           </div>
         </div>
@@ -416,7 +415,7 @@ function JaipurTour({ service, pageConfig }) {
               Your private car, professional driver and a thoughtfully planned Pink City itinerary — all in one effortless day out.
             </p>
             <ul className="relative mt-7 space-y-3">{(service.features || []).map(feature => <li key={feature}>{feature}</li>)}</ul>
-            <p className="relative mt-5 text-2xl font-bold">{service.price}</p>
+            <p className="relative mt-5 text-2xl font-bold">{servicePriceLabel(service)}</p>
           </div>
         </div>
         <div className="mt-10 flex flex-wrap items-end justify-between gap-4">
@@ -849,15 +848,13 @@ function BookingForm({ service }) {
     service.pricingType === "distance" || service.slug === "car-driver";
   const monthlyBased = service.pricingType === "monthly" || permanent;
   const carTypeOptions = distanceBased
-    ? [
-        "SUV (5 seater)",
-        "SUV (7 seater)",
-        "Hatchback (5 seater)",
-        "Haravan Traveller",
-      ]
+    ? service.cabPlans?.length
+      ? service.cabPlans.map(plan => plan.carType)
+      : ["SUV (5 seater)", "SUV (7 seater)", "Hatchback (5 seater)", "Haravan Traveller"]
     : ["Sedan / SUV", "Hatchback"];
   const driverOnly = service.slug === "driver-only" || service.name === "Driver Only";
   const pricing = driverPricing(service.driverPricing);
+  const defaultCarType = service.cabPlans?.find(plan => plan.key === "suv")?.carType || service.cabPlans?.[0]?.carType || "SUV (5 seater)";
   const temporary = driverOnly ||
     !permanent &&
     !distanceBased &&
@@ -879,7 +876,7 @@ function BookingForm({ service }) {
     city: "",
     state: "",
     mainRoad: "",
-    carType: distanceBased ? "SUV (5 seater)" : "Sedan / SUV",
+    carType: distanceBased ? defaultCarType : "Sedan / SUV",
     distanceKm: "",
     driverPackage: "4",
     nightCharge: false,
@@ -916,6 +913,7 @@ function BookingForm({ service }) {
       fare = calculateDistanceFare({
         ...form,
         vehicleRates: service.vehicleRates || { suv: 12, hatchback: 11 },
+        cabPlans: service.cabPlans,
       });
     } catch (error) {
       fareError = error.message;
@@ -1089,7 +1087,7 @@ function BookingForm({ service }) {
     : null;
   let distancePreview = null;
   if (distanceBased && !form.distanceKm) {
-    try { distancePreview = calculateDistanceFare({ carType: form.carType, distanceKm: 1, vehicleRates: service.vehicleRates }); } catch { /* A valid vehicle is required. */ }
+    try { distancePreview = calculateDistanceFare({ carType: form.carType, distanceKm: 1, vehicleRates: service.vehicleRates, cabPlans: service.cabPlans }); } catch { /* A valid vehicle is required. */ }
   }
   const distanceEstimate = distanceBased && <ServiceFareEstimate kind="distance" selected={form.carType} fare={fare} preview={distancePreview} error={form.distanceKm ? fareError : ""} />;
   const monthlyEstimate = monthlyBased && <ServiceFareEstimate kind="monthly" selected={form.duration} duration={form.duration} fare={fare} error={fareError} />;

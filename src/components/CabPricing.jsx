@@ -71,11 +71,9 @@ export default function CabPricing({ service, dark = false }) {
     : tourBased
       ? CalendarDays
       : Clock3;
-  const vehicles = [
-    ["Hatchback", "5 seater", "Hatchback"],
-    ["SUV", "5 / 7 seater", "SUV"],
-    ["Haravan Traveller", "Group travel", "Haravan Traveller"],
-  ];
+  const vehicles = service.cabPlans?.length
+    ? service.cabPlans.map(plan => [plan.name, plan.seats, plan.carType, plan])
+    : [["Hatchback", "5 seater", "Hatchback"], ["SUV", "5 / 7 seater", "SUV"], ["Haravan Traveller", "Group travel", "Haravan Traveller"]];
 
   return (
     <section
@@ -93,11 +91,12 @@ export default function CabPricing({ service, dark = false }) {
       <div className={`fare-options divide-y ${divider}`}>
         {driverOnly && pricing.plans.map(plan => <FareRow key={plan.id} title={plan.label} subtitle={plan.description} amount={money(plan.price)} note={plan.id === "outstation" ? `${money(plan.price)}/day + food/stay` : `${money(pricing.additionalHourlyRate)}/extra hour`} dark={dark} />)}
         {distanceBased &&
-          vehicles.map(([name, seats, carType]) => {
+          vehicles.map(([name, seats, carType, plan]) => {
             const fare = calculateDistanceFare({
               carType,
-              distanceKm: 250,
+              distanceKm: Number(plan?.includedKm) || 1,
               vehicleRates: service.vehicleRates,
+              cabPlans: service.cabPlans,
             });
             return (
               <FareRow

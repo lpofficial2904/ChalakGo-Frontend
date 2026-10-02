@@ -40,6 +40,12 @@ export function siteFetch(url, options = {}) {
 
 async function sharedFetch(url, options = {}) {
   if ((options.method && options.method !== "GET") || options.headers || options.credentials === "include") return fetch(url, options);
+  // Service prices are edited live from Admin. Always request their latest
+  // server value so an older sessionStorage entry can never mask a saved fare.
+  try {
+    if (new URL(url, "https://relative.invalid").pathname === "/api/services")
+      return fetch(url, { ...options, cache: "no-store" });
+  } catch { /* Let the normal request path report malformed URLs. */ }
   const key = `${url}|${options.credentials || "same-origin"}`;
   let entry = responses.get(key);
   if (!entry && canPersist(url, options)) {

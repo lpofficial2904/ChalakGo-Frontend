@@ -1,10 +1,10 @@
 import SiteImage from "./SiteImage.jsx";
 import "./Home.css";
-import { driverPricing } from "../shared/driverPricing.js";
 import { siteFetch } from "../utils/siteFetch.js";
 import { PageText, PageCopyContext } from "./PageCopy.jsx";
 import { useLiveEffect } from "./LiveSite";
 import { assetUrl } from "../utils/assets.js";
+import { servicePriceLabel } from "../utils/servicePricing.js";
 import { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -54,32 +54,6 @@ const reveal = {
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, amount: 0.2 },
 };
-
-function servicePriceLabel(service) {
-  if (service.slug === "driver-only") {
-    const pricing = driverPricing(service.driverPricing);
-    return `Plans from ₹${Math.min(...pricing.plans.map(plan => plan.price)).toLocaleString("en-IN")}`;
-  }
-  if (service.pricingType === "distance" || service.slug === "car-driver") {
-    const rates = Object.values(service.vehicleRates || {}).filter(
-      (rate) => Number(rate) > 0,
-    );
-    return rates.length
-      ? `Cab fares from ₹${Math.min(...rates)}/km`
-      : "Cab fares available";
-  }
-  if (service.pricingType === "fixed" && service.tourPlans?.length)
-    return `Plans from ${service.tourPlans[0].price}`;
-  if (service.pricingType === "monthly" && service.monthlyRates) {
-    const rates = Object.values(service.monthlyRates).filter(
-      (rate) => Number(rate) > 0,
-    );
-    return rates.length
-      ? `Plans from ₹${Math.min(...rates).toLocaleString("en-IN")}/month`
-      : "Monthly plans";
-  }
-  return service.price || "Flexible pricing";
-}
 
 export default function Home() {
   const copy = useContext(PageCopyContext);

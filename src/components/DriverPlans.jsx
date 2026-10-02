@@ -39,7 +39,7 @@ export default function DriverPlans({ pricing: value, selected, onSelect, compac
       })}
     </div>
     <div className={`${collapsed ? "hidden sm:grid" : "grid"} mt-6 gap-4 sm:grid-cols-2`}>
-      <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-600">NIGHT CHARGE POLICY</h3><p className="mt-1 font-semibold">+{money(pricing.nightCharge)} night charge applies</p><p className="mt-1 text-xs text-slate-600">Applicable once for any booking that operates between 10:00 PM and 6:00 AM.</p></div>
+      <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-600">NIGHT CHARGE POLICY</h3><p className="mt-1 font-semibold">+{money(pricing.nightCharge)} per night applies</p><p className="mt-1 text-xs text-slate-600">For Driver Only bookings, charged for each night the trip operates between 10:00 PM and 6:00 AM.</p></div>
       <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-600">ADDITIONAL HOURS</h3><p className="mt-1 font-semibold">{money(pricing.additionalHourlyRate)}/hour</p><p className="mt-1 text-xs text-slate-600">Automatically counted when actual booking duration exceeds selected package hours. Outstation: {money(dailyPrice)}/day + food/stay.</p></div>
     </div>
   </section>;

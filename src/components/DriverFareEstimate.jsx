@@ -20,6 +20,6 @@ export default function DriverFareEstimate({ pricing, selected, fare, error, has
     {hasSchedule && !fare && error && <p className="mt-2 text-red-700">{error}</p>}
     <div className="mt-3 flex items-center justify-between gap-4 border-t border-blue-200 pt-4 text-base font-extrabold"><span>TOTAL ESTIMATE</span><span className="text-xl text-blue-600">{hasSchedule && !fare ? "—" : money(fare?.totalFare ?? plan.price)}</span></div>
     {!fare && !hasSchedule && <p className="mt-2 text-xs text-slate-500">Package estimate. Select dates and times to calculate the trip total.</p>}
-    <p className="mt-3 hidden text-xs text-slate-500 sm:block">* Extra hours beyond package counted at {money(pricing.additionalHourlyRate)}/hr. Night trips (10 PM – 6 AM) add +{money(pricing.nightCharge)} once. Outstation: driver food &amp; stay extra.</p>
+    <p className="mt-3 hidden text-xs text-slate-500 sm:block">* Extra hours beyond package counted at {money(pricing.additionalHourlyRate)}/hr. Driver Only night trips (10 PM – 6 AM) add +{money(pricing.nightCharge)} per night. Outstation: driver food &amp; stay extra.</p>
   </section>;
 }
