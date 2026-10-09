@@ -49,9 +49,9 @@ test("selecting a card immediately updates the estimate; schedules show extra an
       assert.ok(total().includes(`TOTAL ESTIMATE${expected}`));
       assert.ok(total().includes(`${distanceKm} km`));
     }
-    const monthly = calculateMonthlyFare({ duration: "8–10 Hours / Day", monthlyRates: { eightToTen: 18000 } });
+    const monthly = calculateMonthlyFare({ duration: "8–10 Hours / Day", monthlyRates: { eightToTen: 18000 }, startDateTime: "2026-09-08T10:00", endDateTime: "2026-09-13T10:00" });
     await act(async () => root.render(React.createElement(ServiceEstimate, { kind: "monthly", selected: "8–10 Hours / Day", duration: "8–10 Hours / Day", fare: monthly })));
-    assert.match(total(), /TOTAL ESTIMATE₹18,000\/month/);
+    assert.match(total(), /TOTAL ESTIMATE₹3,000/);
     for (const [days, price] of [[1, "₹2,999"], [2, "₹3,499"]]) {
       const fixed = calculateFixedFare({ tourPlanPrice: price });
       await act(async () => root.render(React.createElement(ServiceEstimate, { kind: "fixed", selected: `${days}-day Jaipur Tour`, days, fare: fixed })));
