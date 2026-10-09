@@ -922,6 +922,8 @@ function BookingForm({ service }) {
     try {
       fare = calculateMonthlyFare({
         duration: form.duration,
+        startDateTime: form.startDateTime,
+        endDateTime: form.endDateTime,
         monthlyRates: service.monthlyRates || {
           sixToEight: 15000,
           eightToTen: 18000,

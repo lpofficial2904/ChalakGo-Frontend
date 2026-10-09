@@ -12,8 +12,9 @@ export default function ServiceFareEstimate({ kind, selected, fare, preview, dur
   } else if (kind === "monthly") {
     rows.push(["Daily Working Hours:", duration]);
     rows.push(["Monthly Package Fare:", fare ? `${fareMoney(fare.monthlyRate)}/month` : "—"]);
-    rows.push(["Billing Period:", "1 month"]);
-    note = "Monthly estimate for the selected daily shift. The selected trip dates do not multiply the monthly package price.";
+    rows.push(["Per Day Fare:", fare ? `${fareMoney(fare.dailyRate)}/day` : "Select start and end date"]);
+    rows.push(["Selected Days:", fare ? `${fare.billingDays} day${fare.billingDays === 1 ? "" : "s"}` : "Select start and end date"]);
+    note = "Permanent driver plans are monthly packages. Your estimate is calculated per day from the selected monthly plan and booking dates.";
   } else if (kind === "fixed") {
     rows.push(["Base Package Fare:", fare ? fareMoney(fare.totalFare) : "—"]);
     rows.push(["Trip Duration:", `${days} day${days === 1 ? "" : "s"} tour`]);
@@ -27,14 +28,14 @@ export default function ServiceFareEstimate({ kind, selected, fare, preview, dur
   }
   const total = fare?.totalFare ?? (preview?.baseFare > 0 ? preview.baseFare : null);
   return <section aria-live="polite" className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 text-sm text-[#10213f] sm:col-span-2 sm:p-5">
-    <div className="flex items-center justify-between gap-2"><h3 className="text-base font-extrabold">{kind === "monthly" ? "Monthly Fare Estimate" : "Fare Estimate"}</h3><span className="max-w-[55%] truncate rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">{selected}</span></div>
+    <div className="flex items-center justify-between gap-2"><h3 className="text-base font-extrabold">{kind === "monthly" ? "Permanent Driver Fare Estimate" : "Fare Estimate"}</h3><span className="max-w-[55%] truncate rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">{selected}</span></div>
     <dl className="mt-4 hidden sm:block">
       <div className="mb-2 flex flex-wrap justify-between gap-2 border-b border-blue-100 pb-3"><dt>Selected Package:</dt><dd className="font-bold">{selected}</dd></div>
       {rows.map(([label, amount]) => <div key={label} className="flex flex-wrap justify-between gap-x-4 gap-y-1 py-1"><dt>{label}</dt><dd className="font-medium sm:text-right">{amount}</dd></div>)}
     </dl>
     {kind === "distance" && <p className="mt-3 flex justify-between text-xs text-slate-600 sm:hidden"><span>Trip distance</span><strong>{fare ? `${fare.distanceKm} km` : "Add distance"}</strong></p>}
     {error && <p className="mt-2 text-red-700">{error}</p>}
-    <div className="mt-3 flex justify-between gap-4 border-t border-blue-200 pt-4 text-base font-extrabold"><span>TOTAL ESTIMATE</span><span className="text-xl text-blue-600">{total == null || error ? "—" : `${fareMoney(total)}${kind === "monthly" ? "/month" : ""}`}</span></div>
+    <div className="mt-3 flex justify-between gap-4 border-t border-blue-200 pt-4 text-base font-extrabold"><span>TOTAL ESTIMATE</span><span className="text-xl text-blue-600">{total == null || error ? "—" : fareMoney(total)}</span></div>
     {!fare && preview && <p className="mt-2 text-xs text-slate-500">Enter trip distance to calculate total.</p>}
     {note && <p className="mt-3 hidden text-xs text-slate-500 sm:block">{note}</p>}
   </section>;
