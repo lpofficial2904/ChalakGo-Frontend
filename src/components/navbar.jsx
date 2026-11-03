@@ -33,7 +33,7 @@ export default function Navbar() {
     navbarLogo: "",
     mainFavicon: "",
   });
-  const navbarPages = pages.filter(page => page.slug !== "terms-and-conditions");
+  const navbarPages = pages.filter(page => !["terms-and-conditions", "blog"].includes(page.slug));
 
   // Published admin services are the source of truth for this menu.
   useLiveEffect(() => {

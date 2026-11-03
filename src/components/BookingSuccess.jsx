@@ -1,10 +1,12 @@
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import "./BookingSuccess.css";
+import { trackLead } from '../utils/leadTracking.js';
 
 let homeRedirectTimer;
 
 export function showBookingSuccess(booking, serviceName, loadingId) {
+  trackLead('booking', booking?.bookingId || booking?._id);
   if (loadingId !== undefined) toast.dismiss(loadingId);
   window.clearTimeout(homeRedirectTimer);
   homeRedirectTimer = window.setTimeout(() => {

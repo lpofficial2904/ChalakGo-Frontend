@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { API_BASE } from "../utils/api.js";
+import { trackLead } from '../utils/leadTracking.js';
 
 const officeAddress = "2nd Floor, S-22, Apna Bazar, near Lata Circle, Krishna Colony, Jhotwara, Jaipur, Jaipur Nagar Nigam Area, Rajasthan 302012";
 const fallback = {
@@ -63,6 +64,7 @@ export default function Contact() {
       });
       const data = await response.json();
       if (!response.ok) throw Error(data.message);
+      trackLead('enquiry', data.message?._id);
       setForm({ name: "", phone: "", email: "", message: "" });
       if (data.emailSent) {
         toast.success("Message sent successfully.", {

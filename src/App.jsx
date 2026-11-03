@@ -135,7 +135,8 @@ export default function App() {
       {publicRoute("/jaipur-tour-by-car", Services)}
       {publicRoute("/permanent-driver-jaipur", Services)}
       <Route path="/services/:service" element={<PublicPage><LegacyServiceRoute /></PublicPage>} />
-      {editableRoute("/blog", "blog", Blog)}
+      {publicRoute("/blog", Blog)}
+      <Route path="/p/blog" element={<Navigate replace to="/blog" />} />
       {publicRoute("/blog/:slug", Blog)}
       {publicRoute("/p/:slug", ManagedPage)}
 

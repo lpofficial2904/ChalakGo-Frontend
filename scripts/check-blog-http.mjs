@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import { JSDOM } from 'jsdom';
+const base = process.env.BLOG_CHECK_ORIGIN || 'http://localhost:5500';
+const listing = await fetch(base + '/api/blogs').then(response => response.json());
+assert.ok(listing.length >= 30);
+for (const post of listing) {
+  const response = await fetch(base + '/blog/' + post.slug);
+  assert.equal(response.status, 200, post.slug);
+  const document = new JSDOM(await response.text()).window.document;
+  assert.equal(document.querySelectorAll('h1').length, 1, post.slug);
+  assert.equal(document.querySelector('h1').textContent, post.title, post.slug);
+  const title = post.seoTitle || post.title;
+  assert.equal(document.querySelector('title').textContent, title.includes('ChalakGo') ? title : title + ' | ChalakGo', post.slug);
+  assert.equal(document.querySelector('link[rel=canonical]').href, post.canonicalUrl || 'https://chalakgo.com/blog/' + post.slug);
+  assert.ok(document.querySelector('head meta[name=description]').content);
+  assert.ok(document.querySelector('.journal-prose').textContent.length > 100);
+  JSON.parse(document.querySelector('script[type="application/ld+json"]').textContent);
+}
+const missing = await fetch(base + '/blog/this-article-does-not-exist');
+assert.equal(missing.status, 404);
+assert.equal(missing.headers.get('x-robots-tag'), 'noindex');
+const alias = await fetch(base + '/p/blog', { redirect: 'manual' });
+assert.equal(alias.status, 301);
+assert.equal(alias.headers.get('location'), '/blog');
+const trailing = await fetch(base + '/blog/', { redirect: 'manual' });
+assert.equal(trailing.status, 301);
+const xml = await fetch(base + '/sitemap.xml').then(response => response.text());
+const sitemap = new JSDOM(xml, { contentType: 'text/xml' }).window.document;
+for (const post of listing.filter(post => !post.noindex && (!post.canonicalUrl || post.canonicalUrl === 'https://chalakgo.com/blog/' + post.slug))) assert.ok([...sitemap.querySelectorAll('loc')].some(loc => loc.textContent === 'https://chalakgo.com/blog/' + post.slug));
+const auth = await fetch(base + '/api/blogs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+assert.ok([401, 403].includes(auth.status));
+console.log(`PASS: ${listing.length} actual published blog HTTP pages, initial HTML/canonicals/schema, 404, legacy/trailing 301, XML coverage and unauthenticated-write rejection.`);

@@ -136,11 +136,12 @@ export function SeoProvider({ children }) {
   const dynamic = /^\/(blog|services|p)\/[^/]+$/.test(path);
   const seoPage = serviceSeoPages[path];
   const fallback = seoPage ? [seoPage.title, seoPage.description] : pages[path] || [dynamic ? "ChalakGo" : "Page Not Found", pages["/"][1]];
-  const data = override?.pathname === pathname ? override : {};
+  const initial = typeof window !== 'undefined' && window.__CHALAKGO_BLOG__?.pathname === pathname ? window.__CHALAKGO_BLOG__.seo : null;
+  const data = override?.pathname === pathname ? override : initial || {};
   const name = data.title || fallback[0];
   const title = name.includes("ChalakGo") ? name : `${name} | ChalakGo`;
   const description = (data.description || fallback[1]).replace(/\s+/g, " ").trim().slice(0, 180);
-  const canonical = `https://chalakgo.com${path}`;
+  const canonical = data.canonical || `https://chalakgo.com${path}`;
   const image = new URL(data.image || logo, "https://chalakgo.com").href;
   const noindex = data.noindex || path === "/login" || (!pages[path] && !seoPage && !dynamic);
   const business = {
@@ -161,7 +162,7 @@ export function SeoProvider({ children }) {
     },
     areaServed: { "@type": "City", name: "Jaipur" },
   };
-  const structuredData = path === "/" ? {
+  const structuredData = data.structuredData || (path === "/" ? {
     "@context": "https://schema.org",
     "@graph": [
       { "@type": "Organization", "@id": "https://chalakgo.com/#organization", name: "ChalakGo", url: "https://chalakgo.com/", logo: image },
@@ -178,13 +179,14 @@ export function SeoProvider({ children }) {
         { "@type": "ListItem", position: 3, name: seoPage.serviceName, item: canonical },
       ] },
     ],
-  } : null;
+  } : null);
 
   return (
     <Context.Provider value={setOverride}>
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />
+        {data.keywords && <meta name="keywords" content={data.keywords} />}
         <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
         <link rel="canonical" href={canonical} />
         <meta property="og:site_name" content="ChalakGo" />
@@ -198,21 +200,21 @@ export function SeoProvider({ children }) {
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={image} />
-        {structuredData && <script type="application/ld+json">{JSON.stringify(structuredData)}</script>}
+        {structuredData && <script type="application/ld+json">{JSON.stringify(structuredData).replace(/</g, '\u003c')}</script>}
       </Helmet>
       {children}
     </Context.Provider>
   );
 }
 
-export function usePageSeo({ title, description, image, type, noindex } = {}) {
+export function usePageSeo({ title, description, keywords, image, type, noindex, canonical, structuredData } = {}) {
   const setOverride = useContext(Context);
   const { pathname } = useLocation();
   useEffect(() => {
-    const value = { pathname, title, description, image, type, noindex };
+    const value = { pathname, title, description, keywords, image, type, noindex, canonical, structuredData };
     setOverride(value);
     return () => setOverride((current) => current === value ? null : current);
-  }, [setOverride, pathname, title, description, image, type, noindex]);
+  }, [setOverride, pathname, title, description, keywords, image, type, noindex, canonical, structuredData]);
 }
 
 export function UnavailableSeo() {

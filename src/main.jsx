@@ -10,6 +10,12 @@ import { HelmetProvider } from "react-helmet-async";
 import { SeoProvider } from "./components/Seo.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 
+const blogData = document.getElementById('chalakgo-blog-data');
+if (blogData) {
+  try { window.__CHALAKGO_BLOG__ = JSON.parse(blogData.textContent); } catch { /* Normal API loading remains available. */ }
+  document.querySelectorAll('[data-blog-ssr]').forEach(element => element.remove());
+}
+
 function GoogleAdsPageView() {
   const { pathname, search } = useLocation();
   const previousPage = useRef("");

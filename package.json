@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && vite build --ssr src/entry-blog-server.jsx --outDir dist-server",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:blogs": "node --test src/utils/blogLinks.test.js src/utils/leadTracking.test.js && node scripts/check-blog.mjs && node scripts/check-blog-production.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.2.0",

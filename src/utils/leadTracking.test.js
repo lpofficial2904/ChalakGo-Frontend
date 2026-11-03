@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { trackLead } from './leadTracking.js';
+test('only successful-record IDs create lead events; repeated callbacks are deduplicated', () => {
+  const events = [];
+  const values = new Map();
+  globalThis.window = { gtag: (...args) => events.push(args) };
+  globalThis.sessionStorage = { getItem: key => values.get(key), setItem: (key, value) => values.set(key, value) };
+  assert.equal(trackLead('booking', null), false);
+  assert.equal(trackLead('booking', 'test-booking-1'), true);
+  assert.equal(trackLead('booking', 'test-booking-1'), false);
+  assert.equal(trackLead('enquiry', 'test-enquiry-1'), true);
+  assert.equal(events.length, 2);
+  assert.ok(events.every(([, name]) => name === 'generate_lead'));
+  assert.ok(events.every(([, , payload]) => !('phone' in payload) && !('email' in payload)));
+  window.gtag = () => { throw new Error('Analytics unavailable'); };
+  assert.doesNotThrow(() => trackLead('booking', 'test-booking-2'));
+  delete globalThis.window;
+  delete globalThis.sessionStorage;
+});

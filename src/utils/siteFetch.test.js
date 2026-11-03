@@ -18,18 +18,18 @@ test("fresh public content survives reload, expires, and clears after an admin u
   });
   let calls = 0;
   t.mock.method(globalThis, "fetch", async () => { calls++; return Response.json({ price: 599 }); });
-  const key = 'chalakgo-public-v1:/api/services|same-origin';
+  const key = 'chalakgo-public-v1:/api/blogs|same-origin';
   data.set(key, JSON.stringify({ body: JSON.stringify({ price: 499 }), expires: Date.now() + 30000 }));
   const reloaded = await import('./siteFetch.js?reload-test');
-  assert.equal((await (await reloaded.siteFetch('/api/services')).json()).price, 499);
+  assert.equal((await (await reloaded.siteFetch('/api/blogs')).json()).price, 499);
   assert.equal(calls, 0);
   reloaded.clearSiteCache();
   assert.equal(data.size, 0);
-  assert.equal((await (await reloaded.siteFetch('/api/services')).json()).price, 599);
+  assert.equal((await (await reloaded.siteFetch('/api/blogs')).json()).price, 599);
   assert.equal(calls, 1);
   data.set(key, JSON.stringify({ body: '{}', expires: Date.now() - 1 }));
   const expired = await import('./siteFetch.js?expired-test');
-  await expired.siteFetch('/api/services');
+  await expired.siteFetch('/api/blogs');
   assert.equal(calls, 2);
 });
 
@@ -37,11 +37,11 @@ test("public fetch shares requests, clones bodies, and refreshes on invalidation
   let calls = 0;
   t.mock.method(globalThis, "fetch", async () => { calls++; return Response.json({ price: calls === 1 ? 499 : 599 }); });
   clearSiteCache();
-  const responses = await Promise.all([siteFetch("/api/services"), siteFetch("/api/services"), siteFetch("/api/services")]);
+  const responses = await Promise.all([siteFetch("/api/blogs"), siteFetch("/api/blogs"), siteFetch("/api/blogs")]);
   assert.equal(calls, 1);
   assert.deepEqual(await Promise.all(responses.map(response => response.json())), [{ price: 499 }, { price: 499 }, { price: 499 }]);
   clearSiteCache();
-  assert.equal((await (await siteFetch("/api/services")).json()).price, 599);
+  assert.equal((await (await siteFetch("/api/blogs")).json()).price, 599);
   assert.equal(calls, 2);
 });
 
@@ -49,12 +49,12 @@ test("unsuccessful responses are not cached", async (t) => {
   let calls = 0;
   t.mock.method(globalThis, "fetch", async () => { calls++; return new Response("Unavailable", { status: 503 }); });
   clearSiteCache();
-  await siteFetch("/api/services");
-  await siteFetch("/api/services");
+  await siteFetch("/api/blogs");
+  await siteFetch("/api/blogs");
   assert.equal(calls, 2);
 });
 
-test("an admin save during a pending request cannot restore old prices", async (t) => {
+test("an admin save during a pending request cannot restore old cached content", async (t) => {
   let finishOld;
   let calls = 0;
   t.mock.method(globalThis, "fetch", () => {
@@ -62,9 +62,9 @@ test("an admin save during a pending request cannot restore old prices", async (
     return calls === 1 ? new Promise(resolve => { finishOld = resolve; }) : Promise.resolve(Response.json({ price: 599 }));
   });
   clearSiteCache();
-  const old = siteFetch("/api/services");
+  const old = siteFetch("/api/blogs");
   clearSiteCache();
-  const fresh = await siteFetch("/api/services");
+  const fresh = await siteFetch("/api/blogs");
   finishOld(Response.json({ price: 499 }));
   assert.equal((await (await old).json()).price, 599);
   assert.equal((await fresh.json()).price, 599);
@@ -84,4 +84,17 @@ test("aborting one component does not cancel shared content for other consumers"
   finish(Response.json([{ slug: "home" }]));
   assert.deepEqual(await (await active).json(), [{ slug: "home" }]);
   assert.equal(calls, 1);
+});
+
+test("service prices always use a fresh uncached request", async (t) => {
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async (_url, options) => {
+    assert.equal(options.cache, "no-store");
+    calls++;
+    return Response.json({ price: calls === 1 ? 499 : 599 });
+  });
+  clearSiteCache();
+  assert.equal((await (await siteFetch("/api/services")).json()).price, 499);
+  assert.equal((await (await siteFetch("/api/services")).json()).price, 599);
+  assert.equal(calls, 2);
 });

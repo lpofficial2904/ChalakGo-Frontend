@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { JSDOM } from 'jsdom';
+import { renderBlog } from '../dist-server/entry-blog-server.js';
+import { seoHead, safeJson, blogSitemap } from '../../backend/routes/blogWeb.js';
+import { validateBlogInput } from '../../backend/utils/blogValidation.js';
+const existing = JSON.parse(await readFile(new URL('../../backend/content/jaipurBlogs.json', import.meta.url), 'utf8'));
+const guides = JSON.parse(await readFile(new URL('../../backend/content/serviceBlogs.json', import.meta.url), 'utf8'));
+const posts = [...existing, ...guides];
+const servicePaths = new Set(['/driver-on-demand-jaipur', '/permanent-driver-jaipur', '/cab-car-driver-jaipur', '/jaipur-tour-by-car', '/pricing', '/contact', '/services']);
+const blogPaths = new Set(posts.map(post => '/blog/' + post.slug));
+for (const post of guides) {
+  validateBlogInput(post);
+  assert.ok(post.primaryKeyword && post.secondaryKeywords.length >= 3 && post.secondaryKeywords.length <= 6);
+  assert.ok(post.faqs.length >= 2);
+  const { body, seo } = renderBlog({ pathname: '/blog/' + post.slug, post: { ...post, publishedAt: '2026-11-03', updatedAt: '2026-11-03' }, posts, settings: { siteName: 'ChalakGo' } });
+  const document = new JSDOM('<html><head>' + seoHead(seo, post) + '</head><body>' + body + '</body></html>').window.document;
+  assert.equal(document.querySelectorAll('h1').length, 1);
+  assert.equal(document.querySelectorAll('head title').length, 1);
+  assert.equal(document.querySelector('link[rel=canonical]').href, 'https://chalakgo.com/blog/' + post.slug);
+  assert.ok(document.querySelectorAll('.journal-prose h3').length >= 2);
+  assert.ok(document.querySelector('meta[property="og:type"][content=article]'));
+  const graph = JSON.parse(document.querySelector('script[type="application/ld+json"]').textContent)['@graph'];
+  assert.ok(graph.some(item => item['@type'] === 'BlogPosting' && item.dateModified));
+  assert.ok(graph.some(item => item['@type'] === 'BreadcrumbList'));
+  for (const match of post.content.matchAll(/\]\((\/[^)]+)\)/g)) assert.ok(servicePaths.has(match[1]) || blogPaths.has(match[1]), match[1]);
+}
+const categories = new Map();
+for (const post of guides) categories.set(post.category, (categories.get(post.category) || 0) + 1);
+assert.equal(categories.size, 10);
+assert.ok([...categories.values()].every(count => count >= 2));
+assert.equal(new Set(guides.map(post => post.slug)).size, 20);
+assert.equal(new Set(guides.map(post => post.seoDescription)).size, 20);
+assert.ok(safeJson({ text: '</script><script>evil</script>' }).includes('\\u003c/script>'));
+assert.ok(!blogSitemap([{ slug: 'hidden', noindex: true }]).includes('/blog/hidden'));
+assert.ok(!blogSitemap([{ slug: 'duplicate', canonicalUrl: 'https://chalakgo.com/blog/other' }]).includes('/blog/duplicate'));
+for (const invalid of [{ title: '', content: 'x', slug: 'x' }, { title: 'x', content: 'x', slug: 'bad/path' }, { isPublished: 'false' }, { canonicalUrl: 'https://evil.example/blog/x' }, { coverImage: 'javascript:alert(1)' }, { secondaryKeywords: Array(7).fill('x') }]) assert.throws(() => validateBlogInput(invalid, true));
+console.log('PASS: 20 service articles / 10 categories; server HTML, metadata, JSON-LD, internal destinations, keyword fields, FAQ/H3 rendering, sitemap exclusions and unsafe input rejection.');
